@@ -15,6 +15,13 @@
         "@typescript-eslint",
         "prettier"
     ],
+    "settings": {
+        "import/resolver": {
+          "node": {
+            "extensions": [".js", ".jsx", ".ts", ".tsx"]
+          }
+        }
+      },
     "rules": {
         "prettier/prettier": ["error", { "endOfLine": "auto" }],
         "arrow-body-style": "off",
@@ -25,6 +32,16 @@
             {
                 "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(log|warn|error|info|trace)$/]",
                 "message": "Unexpected property on console object was called"
+            }
+        ],
+        "import/extensions": [
+            "error",
+            "ignorePackages",
+            {
+              "js": "never",
+              "jsx": "never",
+              "ts": "never",
+              "tsx": "never"
             }
         ]
     }
