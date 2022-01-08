@@ -41,11 +41,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var sharp_1 = __importDefault(require("sharp"));
 var path_1 = __importDefault(require("path"));
+var function_1 = __importDefault(require("./function"));
+// resize a given image
 var resize = function (reqParams) { return __awaiter(void 0, void 0, void 0, function () {
-    var imagePath, outputPath;
+    var imagePath, outputPath, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                _a.trys.push([0, 2, , 3]);
                 imagePath = path_1.default.normalize("public/img/full/".concat(reqParams.filename, ".jpg"));
                 outputPath = path_1.default.normalize("public/img/thumb/".concat(reqParams.filename, "_thumb.jpg"));
                 return [4 /*yield*/, (0, sharp_1.default)(imagePath)
@@ -53,17 +56,59 @@ var resize = function (reqParams) { return __awaiter(void 0, void 0, void 0, fun
                         .toFile(outputPath)];
             case 1:
                 _a.sent();
-                return [2 /*return*/];
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                console.log("Error in the resize function : ".concat(error_1));
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-var resizer = function (req, res, next) {
-    var reqParams = {
-        filename: req.query.filename,
-        width: parseInt(req.query.width, 10) || 200,
-        height: parseInt(req.query.height, 10) || 200,
-    };
-    resize(reqParams);
-    next();
-};
+// Middleware resizer
+var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var reqParams, dirFile, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 7, , 8]);
+                if (!req.query.filename) return [3 /*break*/, 5];
+                reqParams = {
+                    filename: req.query.filename,
+                    width: parseInt(req.query.width, 10) || 200,
+                    height: parseInt(req.query.height, 10) || 200,
+                };
+                return [4 /*yield*/, (0, function_1.default)("public/img/full/", "".concat(reqParams.filename))];
+            case 1:
+                dirFile = _a.sent();
+                if (!dirFile) return [3 /*break*/, 3];
+                return [4 /*yield*/, resize(reqParams)];
+            case 2:
+                _a.sent();
+                next();
+                return [3 /*break*/, 4];
+            case 3: throw new Error('No valid input file');
+            case 4: return [3 /*break*/, 6];
+            case 5: throw new Error('No input file');
+            case 6: return [3 /*break*/, 8];
+            case 7:
+                error_2 = _a.sent();
+                res.status(500).send("".concat(error_2));
+                return [3 /*break*/, 8];
+            case 8: return [2 /*return*/];
+        }
+    });
+}); };
 exports.default = resizer;
+// if (req.query.filename) {
+//   const reqParams: queryParams = {
+//     filename: req.query.filename as unknown as string,
+//     width: parseInt(req.query.width as unknown as string, 10) || 200,
+//     height: parseInt(req.query.height as unknown as string, 10) || 200,
+//   };
+//   resize(reqParams);
+//   next();
+// } else {
+//   res.send('No filename');
+//   next(500);
+// }

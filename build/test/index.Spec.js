@@ -45,21 +45,58 @@ var supertest_1 = __importDefault(require("supertest"));
 var index_1 = __importDefault(require("../index"));
 var request = (0, supertest_1.default)(index_1.default);
 describe('Test endpoint responses', function () {
-    it('get the api endpoint', function (done) { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request.get('/')];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(200);
-                    done();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    describe('Test endpoint responses with none or incomplete parameters', function () {
+        it('no parameters send should return should return "no input file"', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, request.get('/api')];
+                    case 1:
+                        response = _a.sent();
+                        expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: No input file');
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        it('filename sends that exists should return 200', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, request.get('/api?filename=aFileName')];
+                    case 1:
+                        response = _a.sent();
+                        expect(response.status).toBe(200);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        it('filename sends that does not exists should return "no valid input file"', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, request.get('/api?filename=notafilename')];
+                    case 1:
+                        response = _a.sent();
+                        expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: No valid input file');
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
+    describe('Test endpoint responses with full correct parameters', function () {
+        it('parameters send should return 200', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, request.get('/api?filename=aFileName&width=200&height=200')];
+                    case 1:
+                        response = _a.sent();
+                        expect(response.status).toBe(200);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
 });
-// import frisby from 'frisby';
-// it('should return a status of 200', () => {
-//   return frisby.get('http://localhost:3000').expect('status', 200);
-// });
