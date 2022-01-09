@@ -39,10 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.resize = exports.readDirectory = void 0;
 var promises_1 = require("fs/promises");
+var sharp_1 = __importDefault(require("sharp"));
 var enum_1 = __importDefault(require("./enum"));
 // list the files of a directory and compare it to filename
-var readDirectory = function (path, filename) { return __awaiter(void 0, void 0, void 0, function () {
+var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, void 0, function () {
     var name, fileExtensions, files, _i, files_1, file, _a, fileExtensions_1, extension, err_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -52,7 +54,7 @@ var readDirectory = function (path, filename) { return __awaiter(void 0, void 0,
             case 1:
                 _b.trys.push([1, 3, , 4]);
                 fileExtensions = Object.values(enum_1.default);
-                return [4 /*yield*/, (0, promises_1.readdir)(path)];
+                return [4 /*yield*/, (0, promises_1.readdir)(dir)];
             case 2:
                 files = _b.sent();
                 for (_i = 0, files_1 = files; _i < files_1.length; _i++) {
@@ -75,4 +77,31 @@ var readDirectory = function (path, filename) { return __awaiter(void 0, void 0,
         }
     });
 }); };
-exports.default = readDirectory;
+exports.readDirectory = readDirectory;
+// resize a given image
+var resize = function (reqParams) { return __awaiter(void 0, void 0, void 0, function () {
+    var outputPath, imagePath, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                outputPath = '';
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                imagePath = "public/img/full/".concat(reqParams.filename, ".jpg");
+                outputPath = "public/img/thumb/".concat(reqParams.filename, "_thumb.jpg");
+                return [4 /*yield*/, (0, sharp_1.default)(imagePath)
+                        .resize(reqParams.width, reqParams.height, { fit: 'cover' })
+                        .toFile(outputPath)];
+            case 2:
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _a.sent();
+                console.log("Error in the resize function : ".concat(error_1));
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/, outputPath];
+        }
+    });
+}); };
+exports.resize = resize;

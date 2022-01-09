@@ -3,8 +3,10 @@ import resizer from '../utilities/middleware';
 
 const routes = express.Router();
 
-routes.use('/', resizer, (req, res) => {
-  res.send('hello api world');
+routes.use('/image', resizer, (req, res) => {
+  res.sendFile(res.locals.thumbPath, {
+    root: '.',
+  });
 });
 
 export default routes;

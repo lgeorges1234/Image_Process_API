@@ -1,10 +1,12 @@
 import { readdir } from 'fs/promises';
+import sharp from 'sharp';
 
 import Extensions from './enum';
+import { queryParams } from './interfaces';
 
 // list the files of a directory and compare it to filename
-const readDirectory = async (
-  path: string,
+export const readDirectory = async (
+  dir: string,
   filename: string
 ): Promise<string> => {
   let name = '';
@@ -12,7 +14,7 @@ const readDirectory = async (
     // transform the enum extension in an iterable array
     const fileExtensions = Object.values(Extensions);
     // list all files from the given path
-    const files = await readdir(path);
+    const files = await readdir(dir);
     for (const file of files) {
       for (const extension of fileExtensions) {
         if (file === filename + extension) {
@@ -27,4 +29,17 @@ const readDirectory = async (
   return name;
 };
 
-export default readDirectory;
+// resize a given image
+export const resize = async (reqParams: queryParams): Promise<string> => {
+  let outputPath = '';
+  try {
+    const imagePath = `public/img/full/${reqParams.filename}.jpg`;
+    outputPath = `public/img/thumb/${reqParams.filename}_thumb.jpg`;
+    await sharp(imagePath)
+      .resize(reqParams.width, reqParams.height, { fit: 'cover' })
+      .toFile(outputPath);
+  } catch (error) {
+    console.log(`Error in the resize function : ${error}`);
+  }
+  return outputPath;
+};

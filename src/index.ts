@@ -10,7 +10,9 @@ const port = 3000;
 // app.use("/img", express.static(path.join(__dirname, 'public/image'));
 // app.use("/js", express.static(path.join(__dirname, 'public/js'));
 
-app.use('/api', routes);
+app.use('/api', routes, (req, res) => {
+  res.send('hello api world');
+});
 
 // Listen on port 3000
 app.listen(port, () => {
