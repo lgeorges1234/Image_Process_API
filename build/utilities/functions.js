@@ -43,7 +43,7 @@ exports.requesteHasFilename = exports.requesteHasValidFilename = exports.resize 
 var promises_1 = require("fs/promises");
 var sharp_1 = __importDefault(require("sharp"));
 var enum_1 = __importDefault(require("./enum"));
-var var_1 = require("./var");
+var variables_1 = require("./variables");
 // list the files of a directory and compare it to filename
 var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, void 0, function () {
     var name, fileExtensions, files, _i, files_1, file, _a, fileExtensions_1, extension, err_1;
@@ -89,8 +89,8 @@ var resize = function (reqParams) { return __awaiter(void 0, void 0, void 0, fun
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                imagePath = "".concat(var_1.inputImageDirectory).concat(reqParams.filename, ".jpg");
-                outputPath = "".concat(var_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
+                imagePath = "".concat(variables_1.inputImageDirectory).concat(reqParams.filename, ".jpg");
+                outputPath = "".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
                 return [4 /*yield*/, (0, sharp_1.default)(imagePath)
                         .resize(reqParams.width, reqParams.height, { fit: 'cover' })
                         .toFile(outputPath)];
@@ -113,7 +113,7 @@ var requesteHasValidFilename = function (res) { return __awaiter(void 0, void 0,
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, (0, exports.readDirectory)("".concat(var_1.inputImageDirectory), "".concat(res.locals.reqParams.filename))];
+                return [4 /*yield*/, (0, exports.readDirectory)("".concat(variables_1.inputImageDirectory), "".concat(res.locals.reqParams.filename))];
             case 1:
                 dirFile = _a.sent();
                 if (dirFile) {

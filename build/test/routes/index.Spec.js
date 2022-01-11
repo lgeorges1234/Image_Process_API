@@ -42,19 +42,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable no-undef */
 require("jasmine");
 var supertest_1 = __importDefault(require("supertest"));
-var index_1 = __importDefault(require("../index"));
+var index_1 = __importDefault(require("../../index"));
 var request = (0, supertest_1.default)(index_1.default);
+var apiRoutes = '/api';
+var imageRoutes = '/api/image';
 describe('Test /api/image responses', function () {
     describe('with none or incomplete parameters', function () {
-        it('no parameters send should return 500 and "no input file"', function () { return __awaiter(void 0, void 0, void 0, function () {
+        it('no parameters send should return 500 and "Filename missing"', function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get('/api/image')];
+                    case 0: return [4 /*yield*/, request.get("".concat(imageRoutes))];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
-                        expect(response.text).toBe('Error: No input file');
                         return [2 /*return*/];
                 }
             });
@@ -63,7 +64,7 @@ describe('Test /api/image responses', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get('/api/image?filename=aFileName')];
+                    case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=aFileName"))];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(200);
@@ -72,15 +73,15 @@ describe('Test /api/image responses', function () {
                 }
             });
         }); });
-        it('filename sends that does not exists should return 500 and "no valid input file"', function () { return __awaiter(void 0, void 0, void 0, function () {
+        it('filename sends that does not exists should return 500 and "Filename does not exist"', function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get('/api/image?filename=notafilename')];
+                    case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=notafilename"))];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
-                        expect(response.text).toBe('Error: No valid input file');
+                        expect(response.text).toBe('Error: Filename does not exist');
                         return [2 /*return*/];
                 }
             });
@@ -91,11 +92,12 @@ describe('Test /api/image responses', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get('/api/image?filename=aFileName&width=200&height=200')];
+                    case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=aFileName&width=200&height=200"))];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(200);
                         expect(response.headers['content-type']).toBe('image/jpeg');
+                        console.log(response.path);
                         return [2 /*return*/];
                 }
             });
@@ -106,7 +108,7 @@ describe('Test /api/image responses', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get('/api')];
+                    case 0: return [4 /*yield*/, request.get("".concat(apiRoutes))];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(200);

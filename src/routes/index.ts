@@ -1,5 +1,5 @@
 import express from 'express';
-import { resizer, verifyCache } from '../utilities/middleware';
+import { resizer, verifyCache } from '../utilities/middlewares';
 
 const routes = express.Router();
 

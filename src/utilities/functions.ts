@@ -4,7 +4,7 @@ import sharp from 'sharp';
 
 import Extensions from './enum';
 import { queryParams } from './interfaces';
-import { inputImageDirectory, outputImageDirectory } from './var';
+import { inputImageDirectory, outputImageDirectory } from './variables';
 
 // list the files of a directory and compare it to filename
 export const readDirectory = async (
@@ -58,29 +58,23 @@ export const requesteHasValidFilename = async (res: Response) => {
       return dirFile;
     }
     // no valid filename in the query throw an error
-    throw new Error('No valid input file');
+    throw new Error('Filename does not exist');
     // send back to the client a 500 and "No valid input file error"
   } catch (error) {
     res.status(500).send(`${error}`);
   }
 };
 
-export const requesteHasFilename = async (req: Request, res: Response) => {
+export const requesteHasFilename = (req: Request, res: Response): boolean => {
   // if the query contains a filename, instancies queryParams
-  try {
-    if (req.query.filename) {
-      const reqParams: queryParams = {
-        filename: req.query.filename as unknown as string,
-        width: parseInt(req.query.width as unknown as string, 10) || 200,
-        height: parseInt(req.query.height as unknown as string, 10) || 200,
-      };
-      res.locals.reqParams = reqParams;
-    } else {
-      // no filename in the query throw an error
-      throw new Error('No input file');
-    }
-    // send back to the client a 500 and "No input file error"
-  } catch (error) {
-    res.status(500).send(`${error}`);
+  if (req.query.filename) {
+    const reqParams: queryParams = {
+      filename: req.query.filename as unknown as string,
+      width: parseInt(req.query.width as unknown as string, 10) || 200,
+      height: parseInt(req.query.height as unknown as string, 10) || 200,
+    };
+    res.locals.reqParams = reqParams;
+    return true;
   }
+  return false;
 };

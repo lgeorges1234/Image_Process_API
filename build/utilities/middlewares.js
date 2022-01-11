@@ -41,8 +41,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyCache = exports.resizer = void 0;
 var node_cache_1 = __importDefault(require("node-cache"));
-var function_1 = require("./function");
-var var_1 = require("./var");
+var functions_1 = require("./functions");
+var variables_1 = require("./variables");
 // Middleware resizer
 var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, reqParams, shouldResize, outputPath, outputPath, error_1;
@@ -53,14 +53,14 @@ var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 
                 _a = res.locals, reqParams = _a.reqParams, shouldResize = _a.shouldResize;
                 if (!!shouldResize) return [3 /*break*/, 1];
                 console.log('Skip resizer');
-                outputPath = "".concat(var_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
+                outputPath = "".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
                 res.locals.thumbPath = outputPath;
                 next();
                 return [3 /*break*/, 3];
             case 1:
                 // test if the file exists
-                (0, function_1.requesteHasValidFilename)(res);
-                return [4 /*yield*/, (0, function_1.resize)(reqParams)];
+                (0, functions_1.requesteHasValidFilename)(res);
+                return [4 /*yield*/, (0, functions_1.resize)(reqParams)];
             case 2:
                 outputPath = _b.sent();
                 res.locals.thumbPath = outputPath;
@@ -83,7 +83,7 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
     return __generator(this, function (_a) {
         try {
             // test if the query contains a filename
-            if ((0, function_1.requesteHasFilename)(req, res)) {
+            if ((0, functions_1.requesteHasFilename)(req, res)) {
                 reqParams = res.locals.reqParams;
                 // test if the processed image is already cached
                 if (cache.has("".concat(JSON.stringify(reqParams.reqParams)))) {
