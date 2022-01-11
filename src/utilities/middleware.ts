@@ -1,43 +1,73 @@
 import express from 'express';
+import NodeCache from 'node-cache';
 
-import { readDirectory, resize } from './function';
-import { queryParams } from './interfaces';
+import {
+  resize,
+  requesteHasFilename,
+  requesteHasValidFilename,
+} from './function';
+
+import { outputImageDirectory } from './var';
 
 // Middleware resizer
-const resizer = async (
+export const resizer = async (
   req: express.Request,
   res: express.Response,
   next: Function
 ) => {
   try {
-    // test if the query contain a filename
-    if (req.query.filename) {
-      const reqParams: queryParams = {
-        filename: req.query.filename as unknown as string,
-        width: parseInt(req.query.width as unknown as string, 10) || 200,
-        height: parseInt(req.query.height as unknown as string, 10) || 200,
-      };
-      // test if the directory public/im/full contain an image file having the file name
-      const dirFile = await readDirectory(
-        `public/img/full/`,
-        `${reqParams.filename}`
-      );
-      // if the file exists, it is resized and send back to the client
-      if (dirFile) {
-        const output = await resize(reqParams);
-        res.locals.thumbPath = output;
-        next();
-        // if the file does not exists an error is thrown
-      } else {
-        throw new Error('No valid input file');
-      }
-      // if there is no filename im the query, an error is thrown
+    const { reqParams } = res.locals;
+    if (!res.locals.shouldResize) {
+      console.log('Skip resizer');
+      const outputPath = `${outputImageDirectory}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
+      res.locals.thumbPath = outputPath;
+      next();
     } else {
-      throw new Error('No input file');
+      // test if the file exists
+      requesteHasValidFilename(res);
+      // resize and pass to the resized image path to the router
+      const outputPath = await resize(reqParams);
+      res.locals.thumbPath = outputPath;
+      next();
     }
   } catch (error) {
     res.status(500).send(`${error}`);
   }
 };
 
-export default resizer;
+// Middleware verifyCache
+
+const cache = new NodeCache();
+
+export const verifyCache = async (
+  req: express.Request,
+  res: express.Response,
+  next: Function
+) => {
+  try {
+    const { reqParams } = res.locals;
+    // test if the query contains a filename
+    requesteHasFilename(req, res);
+    // test if the processed image is already cached
+    if (cache.has(`${JSON.stringify(reqParams.reqParams)}`)) {
+      console.log('Retrieved value from cache !!');
+      // if the image has already been processed, the resizer middleware is skipped
+      res.locals.shouldResize = false;
+      next();
+
+      // if not cached, the cache key is set to the query parameters and the programme advance to the next middleware
+    } else {
+      res.locals.shouldResize = true;
+      console.log('No cache for that !!');
+      // set a key using the query parameters and a ttl of 2hr and 47 mn
+      cache.set(
+        `${JSON.stringify(reqParams)}`,
+        JSON.stringify(reqParams),
+        10000
+      );
+      next();
+    }
+  } catch (error) {
+    res.status(500).send(`${error}`);
+  }
+};

@@ -1,9 +1,9 @@
 import express from 'express';
-import resizer from '../utilities/middleware';
+import { resizer, verifyCache } from '../utilities/middleware';
 
 const routes = express.Router();
 
-routes.use('/image', resizer, (req, res) => {
+routes.use('/image', verifyCache, resizer, (req, res) => {
   res.sendFile(res.locals.thumbPath, {
     root: '.',
   });

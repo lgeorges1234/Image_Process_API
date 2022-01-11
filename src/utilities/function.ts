@@ -1,8 +1,10 @@
+import { Request, Response } from 'express';
 import { readdir } from 'fs/promises';
 import sharp from 'sharp';
 
 import Extensions from './enum';
 import { queryParams } from './interfaces';
+import { inputImageDirectory, outputImageDirectory } from './var';
 
 // list the files of a directory and compare it to filename
 export const readDirectory = async (
@@ -11,9 +13,9 @@ export const readDirectory = async (
 ): Promise<string> => {
   let name = '';
   try {
-    // transform the enum extension in an iterable array
+    // transform the enum "Extensions" in an iterable array
     const fileExtensions = Object.values(Extensions);
-    // list all files from the given path
+    // list all files from the Public Image Directory
     const files = await readdir(dir);
     for (const file of files) {
       for (const extension of fileExtensions) {
@@ -33,8 +35,8 @@ export const readDirectory = async (
 export const resize = async (reqParams: queryParams): Promise<string> => {
   let outputPath = '';
   try {
-    const imagePath = `public/img/full/${reqParams.filename}.jpg`;
-    outputPath = `public/img/thumb/${reqParams.filename}_thumb.jpg`;
+    const imagePath = `${inputImageDirectory}${reqParams.filename}.jpg`;
+    outputPath = `${outputImageDirectory}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
     await sharp(imagePath)
       .resize(reqParams.width, reqParams.height, { fit: 'cover' })
       .toFile(outputPath);
@@ -42,4 +44,43 @@ export const resize = async (reqParams: queryParams): Promise<string> => {
     console.log(`Error in the resize function : ${error}`);
   }
   return outputPath;
+};
+
+// eslint-disable-next-line consistent-return
+export const requesteHasValidFilename = async (res: Response) => {
+  try {
+    // test if the image directory contains an image file having the query file name and return it
+    const dirFile = await readDirectory(
+      `${inputImageDirectory}`,
+      `${res.locals.reqParams.filename}`
+    );
+    if (dirFile) {
+      return dirFile;
+    }
+    // no valid filename in the query throw an error
+    throw new Error('No valid input file');
+    // send back to the client a 500 and "No valid input file error"
+  } catch (error) {
+    res.status(500).send(`${error}`);
+  }
+};
+
+export const requesteHasFilename = async (req: Request, res: Response) => {
+  // if the query contains a filename, instancies queryParams
+  try {
+    if (req.query.filename) {
+      const reqParams: queryParams = {
+        filename: req.query.filename as unknown as string,
+        width: parseInt(req.query.width as unknown as string, 10) || 200,
+        height: parseInt(req.query.height as unknown as string, 10) || 200,
+      };
+      res.locals.reqParams = reqParams;
+    } else {
+      // no filename in the query throw an error
+      throw new Error('No input file');
+    }
+    // send back to the client a 500 and "No input file error"
+  } catch (error) {
+    res.status(500).send(`${error}`);
+  }
 };

@@ -35,41 +35,88 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.verifyCache = exports.resizer = void 0;
+var node_cache_1 = __importDefault(require("node-cache"));
 var function_1 = require("./function");
 // Middleware resizer
 var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var reqParams, dirFile, output, error_1;
+    var reqParams, outputPath, dirFile, outputPath, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 7, , 8]);
-                if (!req.query.filename) return [3 /*break*/, 5];
+                _a.trys.push([0, 6, , 7]);
+                reqParams = res.locals.reqParams;
+                if (!!res.locals.shouldResize) return [3 /*break*/, 1];
+                console.log('Skip resizer');
+                outputPath = "public/img/thumb/".concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
+                res.locals.thumbPath = outputPath;
+                next();
+                return [3 /*break*/, 5];
+            case 1: return [4 /*yield*/, (0, function_1.readDirectory)("public/img/full/", "".concat(reqParams.filename))];
+            case 2:
+                dirFile = _a.sent();
+                if (!dirFile) return [3 /*break*/, 4];
+                return [4 /*yield*/, (0, function_1.resize)(reqParams)];
+            case 3:
+                outputPath = _a.sent();
+                res.locals.thumbPath = outputPath;
+                next();
+                return [3 /*break*/, 5];
+            case 4: throw new Error('No valid input file');
+            case 5: return [3 /*break*/, 7];
+            case 6:
+                error_1 = _a.sent();
+                res.status(500).send("".concat(error_1));
+                return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
+        }
+    });
+}); };
+exports.resizer = resizer;
+// Middleware verifyCache
+var cache = new node_cache_1.default();
+var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var reqParams;
+    return __generator(this, function (_a) {
+        try {
+            // if the query contain a filename, it create an instance of the interface queryParams
+            if (req.query.filename) {
                 reqParams = {
                     filename: req.query.filename,
                     width: parseInt(req.query.width, 10) || 200,
                     height: parseInt(req.query.height, 10) || 200,
                 };
-                return [4 /*yield*/, (0, function_1.readDirectory)("public/img/full/", "".concat(reqParams.filename))];
-            case 1:
-                dirFile = _a.sent();
-                if (!dirFile) return [3 /*break*/, 3];
-                return [4 /*yield*/, (0, function_1.resize)(reqParams)];
-            case 2:
-                output = _a.sent();
-                res.locals.thumbPath = output;
-                next();
-                return [3 /*break*/, 4];
-            case 3: throw new Error('No valid input file');
-            case 4: return [3 /*break*/, 6];
-            case 5: throw new Error('No input file');
-            case 6: return [3 /*break*/, 8];
-            case 7:
-                error_1 = _a.sent();
-                res.status(500).send("".concat(error_1));
-                return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
+                res.locals.reqParams = reqParams;
+                // test if the processed image is already cached
+                if (cache.has("".concat(JSON.stringify(res.locals.reqParams)))) {
+                    console.log('Retrieved value from cache !!');
+                    // if the image has already been processed, the resizer middleware is skipped
+                    res.locals.shouldResize = false;
+                    next();
+                    // if the file is not in the cache, the cache key is set and the programme advance to the next middleware
+                }
+                else {
+                    res.locals.shouldResize = true;
+                    console.log('No cache for that !!');
+                    // set a key using the query parameters and a ttl of 2hr and 47 mn
+                    cache.set("".concat(JSON.stringify(res.locals.reqParams)), JSON.stringify(res.locals.reqParams), 10000);
+                    next();
+                }
+                // if the querry has no filename, an error is throwed
+            }
+            else {
+                throw new Error('No input file');
+            }
+            // send back to the client the : "No input file error"
         }
+        catch (error) {
+            res.status(500).send("".concat(error));
+        }
+        return [2 /*return*/];
     });
 }); };
-exports.default = resizer;
+exports.verifyCache = verifyCache;

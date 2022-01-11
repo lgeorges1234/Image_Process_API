@@ -89,7 +89,7 @@ var resize = function (reqParams) { return __awaiter(void 0, void 0, void 0, fun
             case 1:
                 _a.trys.push([1, 3, , 4]);
                 imagePath = "public/img/full/".concat(reqParams.filename, ".jpg");
-                outputPath = "public/img/thumb/".concat(reqParams.filename, "_thumb.jpg");
+                outputPath = "public/img/thumb/".concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
                 return [4 /*yield*/, (0, sharp_1.default)(imagePath)
                         .resize(reqParams.width, reqParams.height, { fit: 'cover' })
                         .toFile(outputPath)];
