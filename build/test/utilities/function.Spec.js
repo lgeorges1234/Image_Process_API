@@ -72,11 +72,3 @@ describe('The filename is present in the public image directory', function () {
         });
     }); });
 });
-// xdescribe('Test of the filename function', () => {
-//   it('', async () => {
-//     const directory = inputImageDirectory;
-//     const filename = 'aFileName';
-//     const dirFile = await readDirectory(`${directory}`, `${filename}`);
-//     expect(dirFile).toBe('aFileName.jpg');
-//   });
-// });

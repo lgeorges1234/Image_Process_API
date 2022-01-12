@@ -44,7 +44,7 @@ var promises_1 = require("fs/promises");
 var sharp_1 = __importDefault(require("sharp"));
 var enum_1 = __importDefault(require("./enum"));
 var variables_1 = require("./variables");
-// list the files of a directory and compare it to filename
+// list the files of a directory and compare each to the request filename
 var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, void 0, function () {
     var name, fileExtensions, files, _i, files_1, file, _a, fileExtensions_1, extension, err_1;
     return __generator(this, function (_b) {

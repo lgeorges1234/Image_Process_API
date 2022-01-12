@@ -97,7 +97,6 @@ describe('Test /api/image responses', function () {
                         response = _a.sent();
                         expect(response.status).toBe(200);
                         expect(response.headers['content-type']).toBe('image/jpeg');
-                        console.log(response.path);
                         return [2 /*return*/];
                 }
             });
