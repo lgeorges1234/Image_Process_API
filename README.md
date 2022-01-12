@@ -50,9 +50,9 @@ If the filename is missing, or does not correspond to an existing file, a 500 st
 
 |  Parameter  |  Required  |  Description  |
 | ------------- |-------------| -----|
-|   `filename`    | required | Filename of the original image. The filename must be present in the public directory of the server before process. The filename does not include the extension |
-|   `width`      | optional      |   Width of the processed image in px. If no value is provided, the default value is 200 px |
-| `height` | optional      |    Height of the processed image in px. If no value is provided, the default value is 200 px |
+|   `filename`    | *required* | Filename of the original image. The filename must be present in the public directory of the server before process. The filename does not include the extension |
+|   `width`      | *optional*      |   Width of the processed image in px. If no value is provided, the default value is 200 px |
+| `height` | *optional*      |    Height of the processed image in px. If no value is provided, the default value is 200 px |
 
 
 ### Example of API calls:
