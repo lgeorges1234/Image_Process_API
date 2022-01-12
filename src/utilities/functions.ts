@@ -6,7 +6,7 @@ import Extensions from './enum';
 import { queryParams } from './interfaces';
 import { inputImageDirectory, outputImageDirectory } from './variables';
 
-// list the files of a directory and compare it to filename
+// list the files of a directory and compare each to the request filename
 export const readDirectory = async (
   dir: string,
   filename: string
