@@ -87,9 +87,6 @@ If the filename is missing, or does not correspond to an existing file, a 500 st
 #### Run jasmine tests
 `npm run jasmine --silent`
 
-#### Format code and run linter
-`npm run format`
-
 #### Run eslint
 `npm run lint`
 
