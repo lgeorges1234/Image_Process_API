@@ -41,7 +41,7 @@ require("jasmine");
 var functions_1 = require("../../utilities/functions");
 var variables_1 = require("../../utilities/variables");
 describe('The filename is present in the public image directory', function () {
-    it('the readDirectory function return the image file name and extension', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('the readDirectory function return the image file name and extension when given a existing filename', function () { return __awaiter(void 0, void 0, void 0, function () {
         var directory, filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -56,7 +56,7 @@ describe('The filename is present in the public image directory', function () {
             }
         });
     }); });
-    it('the readDirectory function return a null result', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('the readDirectory function return a null result when given an false filename', function () { return __awaiter(void 0, void 0, void 0, function () {
         var directory, filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {

@@ -91,7 +91,7 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
                     // if the image has already been processed, the resizer middleware is skipped
                     res.locals.shouldResize = false;
                     next();
-                    // if not cached, the cache key is set to the query parameters and the programme advance to the next middleware
+                    // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
                 }
                 else {
                     res.locals.shouldResize = true;
@@ -105,7 +105,7 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
                 // no filename in the query throw an error
                 throw new Error('Filename missing');
             }
-            // send back to the client a 500 and "No input file error"
+            // send back to the client a 500 and "Filename Missing"
         }
         catch (error) {
             res.status(500).send("".concat(error));

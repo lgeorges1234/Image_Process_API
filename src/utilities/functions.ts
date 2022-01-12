@@ -6,7 +6,7 @@ import Extensions from './enum';
 import { queryParams } from './interfaces';
 import { inputImageDirectory, outputImageDirectory } from './variables';
 
-// list the files of a directory and compare each to the request filename
+// list the files of a directory and compare every file to the request filename
 export const readDirectory = async (
   dir: string,
   filename: string
@@ -35,8 +35,11 @@ export const readDirectory = async (
 export const resize = async (reqParams: queryParams): Promise<string> => {
   let outputPath = '';
   try {
+    // set the original image path
     const imagePath = `${inputImageDirectory}${reqParams.filename}.jpg`;
+    // set the ouput thumb path
     outputPath = `${outputImageDirectory}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
+    // resize the original image and send the result to the ouput path
     await sharp(imagePath)
       .resize(reqParams.width, reqParams.height, { fit: 'cover' })
       .toFile(outputPath);
@@ -46,6 +49,7 @@ export const resize = async (reqParams: queryParams): Promise<string> => {
   return outputPath;
 };
 
+// Check if the filename belongs to the input folder
 // eslint-disable-next-line consistent-return
 export const requesteHasValidFilename = async (res: Response) => {
   try {
@@ -65,6 +69,7 @@ export const requesteHasValidFilename = async (res: Response) => {
   }
 };
 
+// check if the request contains a filename
 export const requesteHasFilename = (req: Request, res: Response): boolean => {
   // if the query contains a filename, instancies queryParams
   if (req.query.filename) {
