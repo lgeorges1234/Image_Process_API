@@ -3,9 +3,9 @@
 ## Table of contents
 
 * [General info](#general-info)
-* [Technologies](#technologies)
-* [API](#api)
-* [Setup](#setup)
+* [Dependencies](#dependencies)
+* [API call](#api-call)
+* [Available Scripts](#available-scripts)
 ---
 
 ## General info
@@ -15,7 +15,7 @@
 
 ---
 
-## Technologies
+## Dependencies
 
 Project is created with:
 * node: 16.13.0
@@ -33,17 +33,17 @@ Project is created with:
 * eslint: 8.6.0
 ---
 
-## API
+## API call
 
 The API needs to proceeds three parameters: _filename_, _width_ and _height_. 
-> Only filename is *mandatory*, both width and height are set by default to **200 px**.
+> Only filename is __mandatory__, both width and height are set by default to **200 px**.
 
 If the filename is missing, or does not correspond to an existing file, a 500 status code is returned along with an error message,
 
 
 ### API path 
 
-{current_IP}/api/image/
+>`{current_IP}/api/image/`
 
 
 ### Parameters
@@ -51,17 +51,17 @@ If the filename is missing, or does not correspond to an existing file, a 500 st
 |  Parameter  |  Required  |  Description  |
 | ------------- |-------------| -----|
 |   `filename`    | required | Filename of the original image. The filename must be present in the public directory of the server before process. The filename does not include the extension |
-|   `width`      | optional      |   optional	width of the processed image in px. If no value is provided, the default value is 200 px |
+|   `width`      | optional      |   Width of the processed image in px. If no value is provided, the default value is 200 px |
 | `height` | optional      |    Height of the processed image in px. If no value is provided, the default value is 200 px |
 
 
 ### Example of API calls:
 
-{current_IP}/api/image?filename=aFilename
+>`{current_IP}/api/image?filename=aFilename`
 
-{current_IP}/api/image?filename=aFilename&width=350
+>`{current_IP}/api/image?filename=aFilename&width=350`
 
-{current_IP}/api/image?filename=aFilename&width=350&height= 250
+>`{current_IP}/api/image?filename=aFilename&width=350&height=250`
 
 
 ### Available Filenames :
@@ -73,13 +73,30 @@ If the filename is missing, or does not correspond to an existing file, a 500 st
 * santamonica
 ---
 
-## Setup
-To run this project, install it locally using npm:
+## Available Scripts
 
-```
-$ cd ../lorem
-$ npm install
-$ npm start
+#### Run server
+`npm run start`
+
+#### Build application
+`npm run build`
+
+#### Build with TypeScript and run all Tests
+`npm run test`
+
+#### Run jasmine tests
+`npm run jasmine --silent`
+
+#### Format code and run linter
+`npm run format`
+
+#### Run eslint
+`npm run lint`
+
+`npm run lint -- --fix to apply fixes`
+
+#### Run prettier
+`npm run prettier`
 ```
 
 
