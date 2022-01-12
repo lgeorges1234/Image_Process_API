@@ -25,7 +25,7 @@ export const resizer = async (
     } else {
       // test if the file exists
       requesteHasValidFilename(res);
-      // resize and pass to the resized image path to the router
+      // resize and pass the resized thumb path to the router
       const outputPath = await resize(reqParams);
       res.locals.thumbPath = outputPath;
       next();
@@ -54,7 +54,7 @@ export const verifyCache = async (
         // if the image has already been processed, the resizer middleware is skipped
         res.locals.shouldResize = false;
         next();
-        // if not cached, the cache key is set to the query parameters and the programme advance to the next middleware
+        // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
       } else {
         res.locals.shouldResize = true;
         console.log('No cache for that !!');
@@ -70,7 +70,7 @@ export const verifyCache = async (
       // no filename in the query throw an error
       throw new Error('Filename missing');
     }
-    // send back to the client a 500 and "No input file error"
+    // send back to the client a 500 and "Filename Missing"
   } catch (error) {
     res.status(500).send(`${error}`);
   }
