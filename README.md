@@ -1,15 +1,40 @@
-Image Processing API
+Alt-Image Processing API
 
-The Image Processing Api creates thumbs images by resizing an original image. Multiple image format are processed such as "jpg", "png", "gif", "tiff"... 
+## Table of contents
 
-After a first process, the thumb image is cached in the public directory of the server, accelerating the process of a similar query.
+* [General info](#general-info)
+* [Technologies](#technologies)
+* [URL](#url)
 
-URL
-API path :
+## General info
+
+The is an image processing API that creates thumb images by resizing an original image. Multiple image formats are processed such as "jpg", "png", "gif", "tiff"... 
+After a first process, the thumb image is cached in the public directory of the server, accelerating the process of similar queries.
+
+## Technologies
+Project is created with:
+* node: "^16.13.0",
+* express: "^4.17.2",
+* jasmine: "^4.0.0",
+* jasmine-spec-reporter: "^7.0.0",
+* node-cache: "^5.1.2",
+* sharp: "^0.29.3",
+* supertest: "^6.1.6"
+* jasmine-core: "^4.0.0",
+* nodemon: "^2.0.15",
+* prettier: "^2.5.1",
+* ts-node: "^10.4.0",
+* typescript: "^4.5.4",
+* eslint: "^8.6.0",
+
+
+## URL
+
+### API path :
 
 {current_IP}/api/image
 
-API call:
+### API call:
 
 The API needs to proceeds three parameters: a filename, a width and a height. 
 Only the filename is mandatory, both width and height are set by default to 200 px. 
@@ -40,6 +65,14 @@ icelandwaterfall
 palmtunnel
 santamonica
 
+## Setup
+To run this project, install it locally using npm:
+
+```
+$ cd ../lorem
+$ npm install
+$ npm start
+```
 
 
 
