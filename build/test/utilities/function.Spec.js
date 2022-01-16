@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -38,17 +57,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable no-undef */
 require("jasmine");
+var fs_1 = __importStar(require("fs"));
 var functions_1 = require("../../utilities/functions");
 var variables_1 = require("../../utilities/variables");
-describe('The filename is present in the public image directory', function () {
-    it('the readDirectory function return the image file name and extension when given a existing filename', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var directory, filename, dirFile;
+describe('The filename exists in the public image directory', function () {
+    it('the readDirectory function returns the image file name and extension when given an existing filename', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    directory = variables_1.inputImageDirectory;
                     filename = 'aFileName';
-                    return [4 /*yield*/, (0, functions_1.readDirectory)("".concat(directory), "".concat(filename))];
+                    return [4 /*yield*/, (0, functions_1.readDirectory)("".concat(variables_1.inputImageDirectory), "".concat(filename))];
                 case 1:
                     dirFile = _a.sent();
                     expect(dirFile).toBe('aFileName.jpg');
@@ -56,7 +75,7 @@ describe('The filename is present in the public image directory', function () {
             }
         });
     }); });
-    it('the readDirectory function return a null result when given an false filename', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('the readDirectory function return a null result when given a false filename', function () { return __awaiter(void 0, void 0, void 0, function () {
         var directory, filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -67,6 +86,78 @@ describe('The filename is present in the public image directory', function () {
                 case 1:
                     dirFile = _a.sent();
                     expect(dirFile).toBeFalsy();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('The resize function provides an ouput path in the thumb/ directory', function () {
+    it('providing width and height', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams, outputPath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    reqParams = {
+                        filename: 'aFileName',
+                        width: 300,
+                        height: 400,
+                    };
+                    return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
+                case 1:
+                    outputPath = _a.sent();
+                    expect(outputPath).toBe('public/img/thumb/aFileName_300_400_thumb.jpg');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('The makeOutputDir function create an output thumb image', function () {
+    beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
+        var files, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    if (fs_1.default.existsSync(variables_1.outputImageDirectory)) {
+                        files = fs_1.default.readdirSync(variables_1.outputImageDirectory);
+                        files.forEach(function (file) {
+                            fs_1.default.unlinkSync("".concat(variables_1.outputImageDirectory, "/").concat(file));
+                        });
+                    }
+                    return [4 /*yield*/, fs_1.promises.rmdir("".concat(variables_1.outputImageDirectory))];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 3];
+                case 2:
+                    err_1 = _a.sent();
+                    console.log(err_1);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); });
+    it('return true if the thumb/ does not exist ', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var isThumbDirNotPresent;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, functions_1.makeOuputDir)(variables_1.outputImageDirectory)];
+                case 1:
+                    isThumbDirNotPresent = _a.sent();
+                    expect(isThumbDirNotPresent).toBeTrue();
+                    expect(fs_1.default.existsSync(variables_1.outputImageDirectory)).toBeTrue();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('return false if the thumb/ already exists', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var isThumbDirNotPresent;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, functions_1.makeOuputDir)(variables_1.outputImageDirectory)];
+                case 1:
+                    isThumbDirNotPresent = _a.sent();
+                    expect(isThumbDirNotPresent).toBeFalse();
+                    expect(fs_1.default.existsSync(variables_1.outputImageDirectory)).toBeTrue();
                     return [2 /*return*/];
             }
         });

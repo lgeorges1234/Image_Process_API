@@ -13,7 +13,7 @@ describe('Test /api/image responses', () => {
     it('no parameters send should return 500 and "Filename missing"', async () => {
       const response = await request.get(`${imageRoutes}`);
       expect(response.status).toBe(500);
-      // expect(response.text).toBe('Error: Filename missing');
+      // expect(response.text).toBe('Error: Filename is missing');
     });
     it('filename sends that exists should return 200 and an image as a return content-type', async () => {
       const response = await request.get(`${imageRoutes}?filename=aFileName`);
@@ -25,7 +25,14 @@ describe('Test /api/image responses', () => {
         `${imageRoutes}?filename=notafilename`
       );
       expect(response.status).toBe(500);
-      expect(response.text).toBe('Error: Filename does not exist');
+      // expect(response.text).toBe('Error: Filename does not exist');
+    });
+    it('width or height set as different as positive interger should set them by default to 200', async () => {
+      const response = await request.get(
+        `${imageRoutes}?filename=aFileName&width=-1&height=abcd`
+      );
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toBe('image/jpeg');
     });
   });
   describe('Test /api/image responses with full correct parameters', () => {

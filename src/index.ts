@@ -10,7 +10,7 @@ const port = 3000;
 // app.use("/img", express.static(path.join(__dirname, 'public/image'));
 // app.use("/js", express.static(path.join(__dirname, 'public/js'));
 
-app.use('/api', routes, (req, res) => {
+app.use('/api', routes, (req: express.Request, res: express.Response): void => {
   res.send('hello api world');
 });
 

@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,24 +58,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requesteHasFilename = exports.requesteHasValidFilename = exports.resize = exports.readDirectory = void 0;
+exports.makeOuputDir = exports.requesteHasValidInput = exports.requesteHasValidFilename = exports.resize = exports.readDirectory = void 0;
 var promises_1 = require("fs/promises");
 var sharp_1 = __importDefault(require("sharp"));
+var fs_1 = __importStar(require("fs"));
 var enum_1 = __importDefault(require("./enum"));
-var variables_1 = require("./variables");
-// list the files of a directory and compare each to the request filename
+// list the files of a directory and compare every file to the request filename
 var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, void 0, function () {
-    var name, fileExtensions, files, _i, files_1, file, _a, fileExtensions_1, extension, err_1;
+    var name, fileExtensions, files, _i, files_1, file, _a, fileExtensions_1, extension;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 name = '';
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 3, , 4]);
                 fileExtensions = Object.values(enum_1.default);
                 return [4 /*yield*/, (0, promises_1.readdir)(dir)];
-            case 2:
+            case 1:
                 files = _b.sent();
                 for (_i = 0, files_1 = files; _i < files_1.length; _i++) {
                     file = files_1[_i];
@@ -67,80 +83,91 @@ var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, 
                         }
                     }
                 }
-                return [3 /*break*/, 4];
-            case 3:
-                err_1 = _b.sent();
-                console.error(err_1);
-                return [3 /*break*/, 4];
-            case 4: 
-            // return the file if exists or ''
-            return [2 /*return*/, name];
+                // return the file if exists or ''
+                return [2 /*return*/, name];
         }
     });
 }); };
 exports.readDirectory = readDirectory;
 // resize a given image
-var resize = function (reqParams) { return __awaiter(void 0, void 0, void 0, function () {
-    var outputPath, imagePath, error_1;
+var resize = function (reqParams, fullPath, thumbPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var outputPath, imagePath;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 outputPath = '';
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                imagePath = "".concat(variables_1.inputImageDirectory).concat(reqParams.filename, ".jpg");
-                outputPath = "".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
+                imagePath = "".concat(fullPath).concat(reqParams.filename, ".jpg");
+                // set the ouput thumb path
+                outputPath = "".concat(thumbPath).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
+                // resize the original image and send the result to the ouput path
                 return [4 /*yield*/, (0, sharp_1.default)(imagePath)
                         .resize(reqParams.width, reqParams.height, { fit: 'cover' })
                         .toFile(outputPath)];
-            case 2:
+            case 1:
+                // resize the original image and send the result to the ouput path
                 _a.sent();
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _a.sent();
-                console.log("Error in the resize function : ".concat(error_1));
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/, outputPath];
+                return [2 /*return*/, outputPath];
         }
     });
 }); };
 exports.resize = resize;
-// eslint-disable-next-line consistent-return
-var requesteHasValidFilename = function (res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dirFile, error_2;
+// Check if the filename belongs to the input folder
+var requesteHasValidFilename = function (res, fullPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var dirFile;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, (0, exports.readDirectory)("".concat(variables_1.inputImageDirectory), "".concat(res.locals.reqParams.filename))];
+            case 0: return [4 /*yield*/, (0, exports.readDirectory)("".concat(fullPath), "".concat(res.locals.reqParams.filename))];
             case 1:
                 dirFile = _a.sent();
-                if (dirFile) {
-                    return [2 /*return*/, dirFile];
+                // return true if the file existe or false
+                if (dirFile !== '') {
+                    return [2 /*return*/, true];
                 }
-                // no valid filename in the query throw an error
-                throw new Error('Filename does not exist');
-            case 2:
-                error_2 = _a.sent();
-                res.status(500).send("".concat(error_2));
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [2 /*return*/, false];
         }
     });
 }); };
 exports.requesteHasValidFilename = requesteHasValidFilename;
-var requesteHasFilename = function (req, res) {
-    // if the query contains a filename, instancies queryParams
+// test if the value is a positive integer
+function positiveInt(value, defaultResizedValue) {
+    var number = parseInt(value, 10);
+    // return the int value or the default value
+    if (Number.isInteger(number) && number > 0) {
+        return number;
+    }
+    return defaultResizedValue;
+}
+// check if the request has valid parameters
+var requesteHasValidInput = function (req, res, defaultResizedValue) {
+    // if the query contains a filename, instances reqParams
     if (req.query.filename) {
         var reqParams = {
             filename: req.query.filename,
-            width: parseInt(req.query.width, 10) || 200,
-            height: parseInt(req.query.height, 10) || 200,
+            // test if the width and height are valid parameters or set them by default
+            width: positiveInt(req.query.width, defaultResizedValue),
+            height: positiveInt(req.query.height, defaultResizedValue),
         };
         res.locals.reqParams = reqParams;
+        // return true if reqParams has been instanced or false
         return true;
     }
     return false;
 };
-exports.requesteHasFilename = requesteHasFilename;
+exports.requesteHasValidInput = requesteHasValidInput;
+// create a thumb directory if it does not exist
+var makeOuputDir = function (thumbPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var dir;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                dir = fs_1.default.existsSync(thumbPath);
+                if (!!dir) return [3 /*break*/, 2];
+                return [4 /*yield*/, fs_1.promises.mkdir("".concat(thumbPath))];
+            case 1:
+                _a.sent();
+                return [2 /*return*/, true];
+            case 2: return [2 /*return*/, false];
+        }
+    });
+}); };
+exports.makeOuputDir = makeOuputDir;

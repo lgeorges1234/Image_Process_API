@@ -45,33 +45,42 @@ var functions_1 = require("./functions");
 var variables_1 = require("./variables");
 // Middleware resizer
 var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, reqParams, shouldResize, outputPath, outputPath, error_1;
+    var _a, reqParams, shouldResize, dirExist, outputPath, hasValidFilename, outputPath, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
+                _b.trys.push([0, 7, , 8]);
                 _a = res.locals, reqParams = _a.reqParams, shouldResize = _a.shouldResize;
-                if (!!shouldResize) return [3 /*break*/, 1];
+                return [4 /*yield*/, (0, functions_1.makeOuputDir)("".concat(variables_1.outputImageDirectory))];
+            case 1:
+                dirExist = _b.sent();
+                console.log("dirExist: ".concat(dirExist));
+                if (!!shouldResize) return [3 /*break*/, 2];
+                // if the image is already cached, create an output path and pass it to the router
                 console.log('Skip resizer');
                 outputPath = "".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
                 res.locals.thumbPath = outputPath;
                 next();
-                return [3 /*break*/, 3];
-            case 1:
-                // test if the file exists
-                (0, functions_1.requesteHasValidFilename)(res);
-                return [4 /*yield*/, (0, functions_1.resize)(reqParams)];
-            case 2:
+                return [3 /*break*/, 6];
+            case 2: return [4 /*yield*/, (0, functions_1.requesteHasValidFilename)(res, variables_1.inputImageDirectory)];
+            case 3:
+                hasValidFilename = _b.sent();
+                if (!hasValidFilename) return [3 /*break*/, 5];
+                return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
+            case 4:
                 outputPath = _b.sent();
                 res.locals.thumbPath = outputPath;
                 next();
-                _b.label = 3;
-            case 3: return [3 /*break*/, 5];
-            case 4:
+                return [3 /*break*/, 6];
+            case 5: 
+            // no valid filename in the query throws an error
+            throw new Error('Filename does not exist');
+            case 6: return [3 /*break*/, 8];
+            case 7:
                 error_1 = _b.sent();
-                res.status(500).send("".concat(error_1));
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                next(error_1);
+                return [3 /*break*/, 8];
+            case 8: return [2 /*return*/];
         }
     });
 }); };
@@ -82,14 +91,14 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
     var reqParams;
     return __generator(this, function (_a) {
         try {
-            // test if the query contains a filename
-            if ((0, functions_1.requesteHasFilename)(req, res)) {
+            // test if the query contains a filename and valid width and height
+            if ((0, functions_1.requesteHasValidInput)(req, res, variables_1.defaultResizedValue)) {
                 reqParams = res.locals.reqParams;
                 // test if the processed image is already cached
-                if (cache.has("".concat(JSON.stringify(reqParams.reqParams)))) {
-                    console.log('Retrieved value from cache !!');
+                if (cache.has("".concat(JSON.stringify(reqParams)))) {
                     // if the image has already been processed, the resizer middleware is skipped
                     res.locals.shouldResize = false;
+                    console.log('Retrieved value from cache !!');
                     next();
                     // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
                 }
@@ -103,12 +112,11 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
             }
             else {
                 // no filename in the query throw an error
-                throw new Error('Filename missing');
+                throw new Error('Filename is missing');
             }
-            // send back to the client a 500 and "Filename Missing"
         }
         catch (error) {
-            res.status(500).send("".concat(error));
+            next(error);
         }
         return [2 /*return*/];
     });

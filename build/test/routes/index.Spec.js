@@ -81,7 +81,19 @@ describe('Test /api/image responses', function () {
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
-                        expect(response.text).toBe('Error: Filename does not exist');
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        it('width or height set as different as positive interger should set them by default to 200', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=aFileName&width=-1&height=abcd"))];
+                    case 1:
+                        response = _a.sent();
+                        expect(response.status).toBe(200);
+                        expect(response.headers['content-type']).toBe('image/jpeg');
                         return [2 /*return*/];
                 }
             });
