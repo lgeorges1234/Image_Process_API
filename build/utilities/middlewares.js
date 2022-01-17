@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requesteHasValidInput = exports.verifyCache = exports.resizer = void 0;
+exports.errorHandler = exports.requesteHasValidInput = exports.verifyCache = exports.resizer = void 0;
 var functions_1 = require("./functions");
 var variables_1 = require("./variables");
 // Resize an image to the given parameters
@@ -53,8 +53,6 @@ var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 
                 // create a thumb directory if it does not exist
                 _b.sent();
                 if (!!shouldResize) return [3 /*break*/, 2];
-                // if the image is already cached, create an output path and pass it to the router
-                console.log('Skip resizer');
                 outputPath = "".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
                 res.locals.thumbPath = outputPath;
                 next();
@@ -131,3 +129,13 @@ var requesteHasValidInput = function (req, res, next) {
     }
 };
 exports.requesteHasValidInput = requesteHasValidInput;
+// Handle the error message send back to the client
+var errorHandler = function (err, req, res, next) {
+    if (!err) {
+        next();
+    }
+    else {
+        res.status(500).send("".concat(err));
+    }
+};
+exports.errorHandler = errorHandler;

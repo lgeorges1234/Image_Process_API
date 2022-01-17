@@ -56,6 +56,7 @@ describe('Test /api/image responses', function () {
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: Filename is missing');
                         return [2 /*return*/];
                 }
             });
@@ -81,6 +82,7 @@ describe('Test /api/image responses', function () {
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: Filename does not exist');
                         return [2 /*return*/];
                 }
             });

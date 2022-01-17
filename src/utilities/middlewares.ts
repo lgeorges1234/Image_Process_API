@@ -29,7 +29,6 @@ export const resizer = async (
     // test if the image has to be processed or is already cached
     if (!shouldResize) {
       // if the image is already cached, create an output path and pass it to the router
-      console.log('Skip resizer');
       const outputPath = `${outputImageDirectory}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
       res.locals.thumbPath = outputPath;
       next();
@@ -113,5 +112,19 @@ export const requesteHasValidInput = (
     }
   } catch (error) {
     next(error);
+  }
+};
+
+// Handle the error message send back to the client
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!err) {
+    next();
+  } else {
+    res.status(500).send(`${err}`);
   }
 };
