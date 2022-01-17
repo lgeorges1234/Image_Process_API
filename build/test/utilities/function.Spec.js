@@ -76,13 +76,12 @@ describe('The filename exists in the public image directory', function () {
         });
     }); });
     it('the readDirectory function return a null result when given a false filename', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var directory, filename, dirFile;
+        var filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    directory = variables_1.inputImageDirectory;
                     filename = 'notaFileName';
-                    return [4 /*yield*/, (0, functions_1.readDirectory)("".concat(directory), "".concat(filename))];
+                    return [4 /*yield*/, (0, functions_1.readDirectory)("".concat(variables_1.inputImageDirectory), "".concat(filename))];
                 case 1:
                     dirFile = _a.sent();
                     expect(dirFile).toBeFalsy();
@@ -105,7 +104,37 @@ describe('The resize function provides an ouput path in the thumb/ directory', f
                     return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
                 case 1:
                     outputPath = _a.sent();
-                    expect(outputPath).toBe('public/img/thumb/aFileName_300_400_thumb.jpg');
+                    expect(outputPath).toBe("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"));
+                    expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeTrue();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('providing no conform width or height', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    reqParams = {
+                        filename: 'aFileName',
+                        width: -1,
+                        height: 400,
+                    };
+                    // const outputPath = await resize(
+                    //   reqParams,
+                    //   inputImageDirectory,
+                    //   outputImageDirectory
+                    // );
+                    _a = expect;
+                    return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
+                case 1:
+                    // const outputPath = await resize(
+                    //   reqParams,
+                    //   inputImageDirectory,
+                    //   outputImageDirectory
+                    // );
+                    _a.apply(void 0, [_b.sent()]).toThrow('Wrong parameters fot the resize function');
+                    expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
                     return [2 /*return*/];
             }
         });
@@ -160,6 +189,80 @@ describe('The makeOutputDir function create an output thumb image', function () 
                     expect(fs_1.default.existsSync(variables_1.outputImageDirectory)).toBeTrue();
                     return [2 /*return*/];
             }
+        });
+    }); });
+});
+describe('The isInCache function check if the thumb image has already been processed', function () {
+    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams;
+        return __generator(this, function (_a) {
+            try {
+                reqParams = {
+                    filename: 'aFileName',
+                    width: 50,
+                    height: 50,
+                };
+                if (fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))) {
+                    fs_1.default.unlinkSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"));
+                }
+            }
+            catch (err) {
+                console.log(err);
+            }
+            return [2 /*return*/];
+        });
+    }); });
+    it('return false if the thumb image is not in cache', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams, inCache;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    reqParams = {
+                        filename: 'aFileName',
+                        width: 50,
+                        height: 50,
+                    };
+                    return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
+                case 1:
+                    _a.sent();
+                    inCache = (0, functions_1.isInCache)(reqParams, variables_1.outputImageDirectory);
+                    expect(inCache).toBeFalse();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('return true if the thumb image is now in cache and is present in the folder', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams, inCache;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    reqParams = {
+                        filename: 'aFileName',
+                        width: 50,
+                        height: 50,
+                    };
+                    return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
+                case 1:
+                    _a.sent();
+                    inCache = (0, functions_1.isInCache)(reqParams, variables_1.outputImageDirectory);
+                    expect(inCache).toBeTrue();
+                    expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeTrue();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('return false if the thumb image is in cache but is not present in the folder', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams, inCache;
+        return __generator(this, function (_a) {
+            reqParams = {
+                filename: 'aFileName',
+                width: 50,
+                height: 50,
+            };
+            inCache = (0, functions_1.isInCache)(reqParams, variables_1.outputImageDirectory);
+            expect(inCache).toBeFalse();
+            expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
+            return [2 /*return*/];
         });
     }); });
 });

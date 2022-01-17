@@ -1,10 +1,12 @@
-import { Request, Response } from 'express';
 import { readdir } from 'fs/promises';
 import sharp from 'sharp';
 import fs, { promises as fsPromises } from 'fs';
+import NodeCache from 'node-cache';
 
 import Extensions from './enum';
 import { queryParams } from './interfaces';
+
+const cache = new NodeCache();
 
 // list the files of a directory and compare every file to the request filename
 export const readDirectory = async (
@@ -33,28 +35,29 @@ export const resize = async (
   fullPath: string,
   thumbPath: string
 ): Promise<string> => {
-  let outputPath = '';
-  // set the original image path
-  const imagePath = `${fullPath}${reqParams.filename}.jpg`;
-  // set the ouput thumb path
-  outputPath = `${thumbPath}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
-  // resize the original image and send the result to the ouput path
-  await sharp(imagePath)
-    .resize(reqParams.width, reqParams.height, { fit: 'cover' })
-    .toFile(outputPath);
-  return outputPath;
+  try {
+    let outputPath = '';
+    // set the original image path
+    const imagePath = `${fullPath}${reqParams.filename}.jpg`;
+    // set the ouput thumb path
+    outputPath = `${thumbPath}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
+    // resize the original image and send the result to the ouput path
+    await sharp(imagePath)
+      .resize(reqParams.width, reqParams.height, { fit: 'cover' })
+      .toFile(outputPath);
+    return outputPath;
+  } catch {
+    throw new Error('Wrong parameters fot the resize function');
+  }
 };
 
-// Check if the filename belongs to the input folder
+// check if the filename belongs to the input folder
 export const requesteHasValidFilename = async (
-  res: Response,
+  filename: string,
   fullPath: string
 ): Promise<boolean> => {
   // test if the full image directory contains an image file having the query file name
-  const dirFile = await readDirectory(
-    `${fullPath}`,
-    `${res.locals.reqParams.filename}`
-  );
+  const dirFile = await readDirectory(`${fullPath}`, `${filename}`);
   // return true if the file existe or false
   if (dirFile !== '') {
     return true;
@@ -63,7 +66,10 @@ export const requesteHasValidFilename = async (
 };
 
 // test if the value is a positive integer
-function positiveInt(value: string, defaultResizedValue: number): number {
+export function positiveInt(
+  value: string,
+  defaultResizedValue: number
+): number {
   const number = parseInt(value, 10);
   // return the int value or the default value
   if (Number.isInteger(number) && number > 0) {
@@ -72,33 +78,6 @@ function positiveInt(value: string, defaultResizedValue: number): number {
   return defaultResizedValue;
 }
 
-// check if the request has valid parameters
-export const requesteHasValidInput = (
-  req: Request,
-  res: Response,
-  defaultResizedValue: number
-): boolean => {
-  // if the query contains a filename, instances reqParams
-  if (req.query.filename) {
-    const reqParams: queryParams = {
-      filename: req.query.filename as unknown as string,
-      // test if the width and height are valid parameters or set them by default
-      width: positiveInt(
-        req.query.width as unknown as string,
-        defaultResizedValue
-      ),
-      height: positiveInt(
-        req.query.height as unknown as string,
-        defaultResizedValue
-      ),
-    };
-    res.locals.reqParams = reqParams;
-    // return true if reqParams has been instanced or false
-    return true;
-  }
-  return false;
-};
-
 // create a thumb directory if it does not exist
 export const makeOuputDir = async (thumbPath: string): Promise<boolean> => {
   const dir = fs.existsSync(thumbPath);
@@ -106,5 +85,24 @@ export const makeOuputDir = async (thumbPath: string): Promise<boolean> => {
     await fsPromises.mkdir(`${thumbPath}`);
     return true;
   }
+  return false;
+};
+
+export const isInCache = (
+  reqParams: queryParams,
+  outputPath: string
+): boolean => {
+  // check if the image is in the cache key and exists in the directory
+  const inCache = cache.has(`${JSON.stringify(reqParams)}`);
+  if (
+    inCache &&
+    fs.existsSync(
+      `${outputPath}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`
+    )
+  ) {
+    return true;
+  }
+  // set a key using the query parameters and a ttl of 2hr and 47 mn
+  cache.set(`${JSON.stringify(reqParams)}`, JSON.stringify(reqParams), 10000);
   return false;
 };

@@ -35,26 +35,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyCache = exports.resizer = void 0;
-var node_cache_1 = __importDefault(require("node-cache"));
+exports.requesteHasValidInput = exports.verifyCache = exports.resizer = void 0;
 var functions_1 = require("./functions");
 var variables_1 = require("./variables");
-// Middleware resizer
+// Resize an image to the given parameters
 var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, reqParams, shouldResize, dirExist, outputPath, hasValidFilename, outputPath, error_1;
+    var _a, reqParams, shouldResize, outputPath, hasValidFilename, outputPath, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _b.trys.push([0, 7, , 8]);
                 _a = res.locals, reqParams = _a.reqParams, shouldResize = _a.shouldResize;
+                // create a thumb directory if it does not exist
                 return [4 /*yield*/, (0, functions_1.makeOuputDir)("".concat(variables_1.outputImageDirectory))];
             case 1:
-                dirExist = _b.sent();
-                console.log("dirExist: ".concat(dirExist));
+                // create a thumb directory if it does not exist
+                _b.sent();
                 if (!!shouldResize) return [3 /*break*/, 2];
                 // if the image is already cached, create an output path and pass it to the router
                 console.log('Skip resizer');
@@ -62,7 +59,7 @@ var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 
                 res.locals.thumbPath = outputPath;
                 next();
                 return [3 /*break*/, 6];
-            case 2: return [4 /*yield*/, (0, functions_1.requesteHasValidFilename)(res, variables_1.inputImageDirectory)];
+            case 2: return [4 /*yield*/, (0, functions_1.requesteHasValidFilename)(reqParams.filename, variables_1.inputImageDirectory)];
             case 3:
                 hasValidFilename = _b.sent();
                 if (!hasValidFilename) return [3 /*break*/, 5];
@@ -85,34 +82,22 @@ var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.resizer = resizer;
-// Middleware verifyCache
-var cache = new node_cache_1.default();
+// Tell if the image has already been processed
 var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var reqParams;
     return __generator(this, function (_a) {
         try {
-            // test if the query contains a filename and valid width and height
-            if ((0, functions_1.requesteHasValidInput)(req, res, variables_1.defaultResizedValue)) {
-                reqParams = res.locals.reqParams;
-                // test if the processed image is already cached
-                if (cache.has("".concat(JSON.stringify(reqParams)))) {
-                    // if the image has already been processed, the resizer middleware is skipped
-                    res.locals.shouldResize = false;
-                    console.log('Retrieved value from cache !!');
-                    next();
-                    // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
-                }
-                else {
-                    res.locals.shouldResize = true;
-                    console.log('No cache for that !!');
-                    // set a key using the query parameters and a ttl of 2hr and 47 mn
-                    cache.set("".concat(JSON.stringify(reqParams)), JSON.stringify(reqParams), 10000);
-                    next();
-                }
+            reqParams = res.locals.reqParams;
+            // test if the processed image is already cached
+            if ((0, functions_1.isInCache)(reqParams, variables_1.outputImageDirectory)) {
+                // if the image has already been processed, the resizer middleware is skipped
+                res.locals.shouldResize = false;
+                next();
+                // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
             }
             else {
-                // no filename in the query throw an error
-                throw new Error('Filename is missing');
+                res.locals.shouldResize = true;
+                next();
             }
         }
         catch (error) {
@@ -122,3 +107,27 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
     });
 }); };
 exports.verifyCache = verifyCache;
+// check if the request has valid parameters
+var requesteHasValidInput = function (req, res, next) {
+    // if the query contains a filename, instances reqParams
+    try {
+        if (req.query.filename) {
+            var reqParams = {
+                filename: req.query.filename,
+                // test if the width and height are valid parameters or set them by default
+                width: (0, functions_1.positiveInt)(req.query.width, variables_1.defaultResizedValue),
+                height: (0, functions_1.positiveInt)(req.query.height, variables_1.defaultResizedValue),
+            };
+            res.locals.reqParams = reqParams;
+            next();
+        }
+        else {
+            // no filename in the query throw an error
+            throw new Error('Filename is missing');
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.requesteHasValidInput = requesteHasValidInput;

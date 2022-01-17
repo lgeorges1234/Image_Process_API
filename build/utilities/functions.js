@@ -58,11 +58,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeOuputDir = exports.requesteHasValidInput = exports.requesteHasValidFilename = exports.resize = exports.readDirectory = void 0;
+exports.isInCache = exports.makeOuputDir = exports.positiveInt = exports.requesteHasValidFilename = exports.resize = exports.readDirectory = void 0;
 var promises_1 = require("fs/promises");
 var sharp_1 = __importDefault(require("sharp"));
 var fs_1 = __importStar(require("fs"));
+var node_cache_1 = __importDefault(require("node-cache"));
 var enum_1 = __importDefault(require("./enum"));
+var cache = new node_cache_1.default();
 // list the files of a directory and compare every file to the request filename
 var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, void 0, function () {
     var name, fileExtensions, files, _i, files_1, file, _a, fileExtensions_1, extension;
@@ -91,10 +93,11 @@ var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, 
 exports.readDirectory = readDirectory;
 // resize a given image
 var resize = function (reqParams, fullPath, thumbPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var outputPath, imagePath;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var outputPath, imagePath, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
+                _b.trys.push([0, 2, , 3]);
                 outputPath = '';
                 imagePath = "".concat(fullPath).concat(reqParams.filename, ".jpg");
                 // set the ouput thumb path
@@ -105,18 +108,22 @@ var resize = function (reqParams, fullPath, thumbPath) { return __awaiter(void 0
                         .toFile(outputPath)];
             case 1:
                 // resize the original image and send the result to the ouput path
-                _a.sent();
+                _b.sent();
                 return [2 /*return*/, outputPath];
+            case 2:
+                _a = _b.sent();
+                throw new TypeError('wrong parameters fot the resize function');
+            case 3: return [2 /*return*/];
         }
     });
 }); };
 exports.resize = resize;
-// Check if the filename belongs to the input folder
-var requesteHasValidFilename = function (res, fullPath) { return __awaiter(void 0, void 0, void 0, function () {
+// check if the filename belongs to the input folder
+var requesteHasValidFilename = function (filename, fullPath) { return __awaiter(void 0, void 0, void 0, function () {
     var dirFile;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, exports.readDirectory)("".concat(fullPath), "".concat(res.locals.reqParams.filename))];
+            case 0: return [4 /*yield*/, (0, exports.readDirectory)("".concat(fullPath), "".concat(filename))];
             case 1:
                 dirFile = _a.sent();
                 // return true if the file existe or false
@@ -137,23 +144,7 @@ function positiveInt(value, defaultResizedValue) {
     }
     return defaultResizedValue;
 }
-// check if the request has valid parameters
-var requesteHasValidInput = function (req, res, defaultResizedValue) {
-    // if the query contains a filename, instances reqParams
-    if (req.query.filename) {
-        var reqParams = {
-            filename: req.query.filename,
-            // test if the width and height are valid parameters or set them by default
-            width: positiveInt(req.query.width, defaultResizedValue),
-            height: positiveInt(req.query.height, defaultResizedValue),
-        };
-        res.locals.reqParams = reqParams;
-        // return true if reqParams has been instanced or false
-        return true;
-    }
-    return false;
-};
-exports.requesteHasValidInput = requesteHasValidInput;
+exports.positiveInt = positiveInt;
 // create a thumb directory if it does not exist
 var makeOuputDir = function (thumbPath) { return __awaiter(void 0, void 0, void 0, function () {
     var dir;
@@ -171,3 +162,15 @@ var makeOuputDir = function (thumbPath) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.makeOuputDir = makeOuputDir;
+var isInCache = function (reqParams, outputPath) {
+    // check if the image is in the cache key and exists in the directory
+    var inCache = cache.has("".concat(JSON.stringify(reqParams)));
+    if (inCache &&
+        fs_1.default.existsSync("".concat(outputPath).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))) {
+        return true;
+    }
+    // set a key using the query parameters and a ttl of 2hr and 47 mn
+    cache.set("".concat(JSON.stringify(reqParams)), JSON.stringify(reqParams), 10000);
+    return false;
+};
+exports.isInCache = isInCache;

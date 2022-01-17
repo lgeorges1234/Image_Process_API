@@ -1,11 +1,12 @@
-import express from 'express';
-import NodeCache from 'node-cache';
+import { Request, Response, NextFunction } from 'express';
+import { queryParams } from './interfaces';
 
 import {
   resize,
-  requesteHasValidInput,
   requesteHasValidFilename,
   makeOuputDir,
+  positiveInt,
+  isInCache,
 } from './functions';
 
 import {
@@ -14,18 +15,17 @@ import {
   defaultResizedValue,
 } from './variables';
 
-// Middleware resizer
+// Resize an image to the given parameters
 export const resizer = async (
-  req: express.Request,
-  res: express.Response,
-  next: Function
+  req: Request,
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     // import the query parameters and the shouldResize boolean from locals
     const { reqParams, shouldResize } = res.locals;
     // create a thumb directory if it does not exist
-    const dirExist = await makeOuputDir(`${outputImageDirectory}`);
-    console.log(`dirExist: ${dirExist}`);
+    await makeOuputDir(`${outputImageDirectory}`);
     // test if the image has to be processed or is already cached
     if (!shouldResize) {
       // if the image is already cached, create an output path and pass it to the router
@@ -36,7 +36,7 @@ export const resizer = async (
     } else {
       // else, process the image
       const hasValidFilename = await requesteHasValidFilename(
-        res,
+        reqParams.filename as unknown as string,
         inputImageDirectory
       );
       // test if the file exists in the public folder
@@ -59,37 +59,54 @@ export const resizer = async (
   }
 };
 
-// Middleware verifyCache
-
-const cache = new NodeCache();
+// Tell if the image has already been processed
 
 export const verifyCache = async (
-  req: express.Request,
-  res: express.Response,
-  next: Function
+  req: Request,
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     // test if the query contains a filename and valid width and height
-    if (requesteHasValidInput(req, res, defaultResizedValue)) {
-      const { reqParams } = res.locals;
-      // test if the processed image is already cached
-      if (cache.has(`${JSON.stringify(reqParams)}`)) {
-        // if the image has already been processed, the resizer middleware is skipped
-        res.locals.shouldResize = false;
-        console.log('Retrieved value from cache !!');
-        next();
-        // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
-      } else {
-        res.locals.shouldResize = true;
-        console.log('No cache for that !!');
-        // set a key using the query parameters and a ttl of 2hr and 47 mn
-        cache.set(
-          `${JSON.stringify(reqParams)}`,
-          JSON.stringify(reqParams),
-          10000
-        );
-        next();
-      }
+    const { reqParams } = res.locals;
+    // test if the processed image is already cached
+    if (isInCache(reqParams, outputImageDirectory)) {
+      // if the image has already been processed, the resizer middleware is skipped
+      res.locals.shouldResize = false;
+      next();
+      // if not cached, the cache key is set to the query parameters and the programme advance to the resizer
+    } else {
+      res.locals.shouldResize = true;
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// check if the request has valid parameters
+export const requesteHasValidInput = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  // if the query contains a filename, instances reqParams
+  try {
+    if (req.query.filename) {
+      const reqParams: queryParams = {
+        filename: req.query.filename as unknown as string,
+        // test if the width and height are valid parameters or set them by default
+        width: positiveInt(
+          req.query.width as unknown as string,
+          defaultResizedValue
+        ),
+        height: positiveInt(
+          req.query.height as unknown as string,
+          defaultResizedValue
+        ),
+      };
+      res.locals.reqParams = reqParams;
+      next();
     } else {
       // no filename in the query throw an error
       throw new Error('Filename is missing');
