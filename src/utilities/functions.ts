@@ -47,7 +47,7 @@ export const resize = async (
       .toFile(outputPath);
     return outputPath;
   } catch {
-    throw new Error('Wrong parameters fot the resize function');
+    throw new Error('Wrong parameters for the resize function');
   }
 };
 

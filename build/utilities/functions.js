@@ -112,7 +112,7 @@ var resize = function (reqParams, fullPath, thumbPath) { return __awaiter(void 0
                 return [2 /*return*/, outputPath];
             case 2:
                 _a = _b.sent();
-                throw new Error('Wrong parameters fot the resize function');
+                throw new Error('Wrong parameters for the resize function');
             case 3: return [2 /*return*/];
         }
     });

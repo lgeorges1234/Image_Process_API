@@ -60,14 +60,9 @@ describe('The resize function provides an ouput path in the thumb/ directory', (
       width: -1,
       height: 400,
     };
-    // const outputPath = await resize(
-    //   reqParams,
-    //   inputImageDirectory,
-    //   outputImageDirectory
-    // );
-    expect(
-      await resize(reqParams, inputImageDirectory, outputImageDirectory)
-    ).toThrow('Wrong parameters fot the resize function');
+    expect(async function resizer() {
+      await resize(reqParams, inputImageDirectory, outputImageDirectory);
+    }).toThrowError('Wrong parameters for the resize function');
     expect(
       fs.existsSync(
         `${outputImageDirectory}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`

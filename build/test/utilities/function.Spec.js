@@ -111,32 +111,27 @@ describe('The resize function provides an ouput path in the thumb/ directory', f
         });
     }); });
     it('providing no conform width or height', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var reqParams, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    reqParams = {
-                        filename: 'aFileName',
-                        width: -1,
-                        height: 400,
-                    };
-                    // const outputPath = await resize(
-                    //   reqParams,
-                    //   inputImageDirectory,
-                    //   outputImageDirectory
-                    // );
-                    _a = expect;
-                    return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
-                case 1:
-                    // const outputPath = await resize(
-                    //   reqParams,
-                    //   inputImageDirectory,
-                    //   outputImageDirectory
-                    // );
-                    _a.apply(void 0, [_b.sent()]).toThrow('Wrong parameters fot the resize function');
-                    expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
-                    return [2 /*return*/];
-            }
+        var reqParams;
+        return __generator(this, function (_a) {
+            reqParams = {
+                filename: 'aFileName',
+                width: -1,
+                height: 400,
+            };
+            expect(function resizer() {
+                return __awaiter(this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
+                            case 1:
+                                _a.sent();
+                                return [2 /*return*/];
+                        }
+                    });
+                });
+            }).toThrowError('Wrong parameters for the resize function');
+            expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
+            return [2 /*return*/];
         });
     }); });
 });
