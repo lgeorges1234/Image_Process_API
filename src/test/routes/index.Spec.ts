@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+/* eslint-disable import/no-extraneous-dependencies */
 import 'jasmine';
 import supertest from 'supertest';
 import app from '../../index';

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-undef */
 import 'jasmine';
 import fs, { promises as fsPromises } from 'fs';
@@ -55,15 +56,18 @@ describe('The resize function ', () => {
       )
     ).toBeTrue();
   });
-  xit('return an Error message when providing no conform width or height', async () => {
+  it('return an Error message when providing no conform width or height', async () => {
     const reqParams: queryParams = {
       filename: 'aFileName',
       width: -1,
       height: 400,
     };
-    expect(async function positive() {
-      await resize(reqParams, inputImageDirectory, outputImageDirectory);
-    }).toThrow();
+    const myPromise = resize(
+      reqParams,
+      inputImageDirectory,
+      outputImageDirectory
+    );
+    await expectAsync(myPromise).toBeRejected();
     expect(
       fs.existsSync(
         `${outputImageDirectory}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`

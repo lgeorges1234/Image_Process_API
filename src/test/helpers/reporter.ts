@@ -1,3 +1,6 @@
+/* eslint-disable no-undef */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable import/no-extraneous-dependencies */
 import {
   DisplayProcessor,
   SpecReporter,

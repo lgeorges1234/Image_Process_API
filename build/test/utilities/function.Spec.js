@@ -55,6 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-undef */
 require("jasmine");
 var fs_1 = __importStar(require("fs"));
@@ -110,28 +111,23 @@ describe('The resize function ', function () {
             }
         });
     }); });
-    xit('return an Error message when providing no conform width or height', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var reqParams;
+    it('return an Error message when providing no conform width or height', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var reqParams, myPromise;
         return __generator(this, function (_a) {
-            reqParams = {
-                filename: 'aFileName',
-                width: -1,
-                height: 400,
-            };
-            expect(function positive() {
-                return __awaiter(this, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
-                            case 1:
-                                _a.sent();
-                                return [2 /*return*/];
-                        }
-                    });
-                });
-            }).toThrow();
-            expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    reqParams = {
+                        filename: 'aFileName',
+                        width: -1,
+                        height: 400,
+                    };
+                    myPromise = (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory);
+                    return [4 /*yield*/, expectAsync(myPromise).toBeRejected()];
+                case 1:
+                    _a.sent();
+                    expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
+                    return [2 /*return*/];
+            }
         });
     }); });
 });
