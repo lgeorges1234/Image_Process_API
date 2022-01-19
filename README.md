@@ -88,12 +88,14 @@ If the any parameter is missing, invalid or the filename does not correspond to 
 `npm run jasmine --silent`
 
 #### Run eslint
-`npm run lint`
+`npm run eslint`
 
-`npm run lint -- --fix to apply fixes`
+`npm run eslint:fix  to apply fixes`
 
 #### Run prettier
 `npm run prettier`
+
+`npm run prettier:fix  to apply fixes`
 ```
 
 
