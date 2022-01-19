@@ -46,9 +46,9 @@ var index_1 = __importDefault(require("../../index"));
 var request = (0, supertest_1.default)(index_1.default);
 var apiRoutes = '/api';
 var imageRoutes = '/api/image';
-describe('Test /api/image responses', function () {
-    describe('with none or incomplete parameters', function () {
-        it('no parameters send should return 500 and "Filename missing"', function () { return __awaiter(void 0, void 0, void 0, function () {
+describe('Test /api/image', function () {
+    describe('with none or incomplete parameters - ', function () {
+        it('no parameters send should return 500 and "Filename, width and height are missing"', function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -56,25 +56,25 @@ describe('Test /api/image responses', function () {
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
-                        expect(response.text).toBe('Error: Filename is missing');
+                        expect(response.text).toBe('Error: Filename, width and height are missing');
                         return [2 /*return*/];
                 }
             });
         }); });
-        it('filename sends that exists should return 200 and an image as a return content-type', function () { return __awaiter(void 0, void 0, void 0, function () {
+        it('filename sends that exists should return 500 and "Width and heiht are missing"', function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=aFileName"))];
                     case 1:
                         response = _a.sent();
-                        expect(response.status).toBe(200);
-                        expect(response.headers['content-type']).toBe('image/jpeg');
+                        expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: Width and heiht are missing');
                         return [2 /*return*/];
                 }
             });
         }); });
-        it('filename sends that does not exists should return 500 and "Filename does not exist"', function () { return __awaiter(void 0, void 0, void 0, function () {
+        it('filename sends that does not exists should return 500 and "Width and heiht are missing and Filename does not exist"', function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -82,20 +82,33 @@ describe('Test /api/image responses', function () {
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(500);
-                        expect(response.text).toBe('Error: Filename does not exist');
+                        expect(response.text).toBe('Error: Width and heiht are missing and Filename does not exist');
                         return [2 /*return*/];
                 }
             });
         }); });
-        it('width or height set as different as positive interger should set them by default to 200', function () { return __awaiter(void 0, void 0, void 0, function () {
+        it('width set as negative should return 500 and "Error: The width is not positive"', function () { return __awaiter(void 0, void 0, void 0, function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=aFileName&width=-1&height=abcd"))];
                     case 1:
                         response = _a.sent();
-                        expect(response.status).toBe(200);
-                        expect(response.headers['content-type']).toBe('image/jpeg');
+                        expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: The width is not positive');
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        it('heigth set as letter should return 500 and "Error: The heigth is not positive"', function () { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, request.get("".concat(imageRoutes, "?filename=aFileName&width=100&height=abcd"))];
+                    case 1:
+                        response = _a.sent();
+                        expect(response.status).toBe(500);
+                        expect(response.text).toBe('Error: The height is not an integer');
                         return [2 /*return*/];
                 }
             });

@@ -93,27 +93,27 @@ var readDirectory = function (dir, filename) { return __awaiter(void 0, void 0, 
 exports.readDirectory = readDirectory;
 // resize a given image
 var resize = function (reqParams, fullPath, thumbPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var outputPath, imagePath, _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var outputPath, imagePath, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _b.trys.push([0, 2, , 3]);
                 outputPath = '';
                 imagePath = "".concat(fullPath).concat(reqParams.filename, ".jpg");
                 // set the ouput thumb path
                 outputPath = "".concat(thumbPath).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
-                // resize the original image and send the result to the ouput path
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, (0, sharp_1.default)(imagePath)
                         .resize(reqParams.width, reqParams.height, { fit: 'cover' })
                         .toFile(outputPath)];
-            case 1:
-                // resize the original image and send the result to the ouput path
-                _b.sent();
-                return [2 /*return*/, outputPath];
             case 2:
-                _a = _b.sent();
-                throw new Error('Wrong parameters for the resize function');
-            case 3: return [2 /*return*/];
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _a.sent();
+                throw new Error("not a valid parameter".concat(error_1));
+            case 4: return [2 /*return*/, outputPath];
         }
     });
 }); };
@@ -136,13 +136,18 @@ var requesteHasValidFilename = function (filename, fullPath) { return __awaiter(
 }); };
 exports.requesteHasValidFilename = requesteHasValidFilename;
 // test if the value is a positive integer
-function positiveInt(value, defaultResizedValue) {
-    var number = parseInt(value, 10);
-    // return the int value or the default value
-    if (Number.isInteger(number) && number > 0) {
-        return number;
+function positiveInt(value, param) {
+    if (parseInt(value, 10)) {
+        var number = parseInt(value, 10);
+        if (number > 0) {
+            return number;
+        }
+        throw new Error("The ".concat(param, " is not positive"));
     }
-    return defaultResizedValue;
+    else {
+        throw new Error("The ".concat(param, " is not an integer"));
+    }
+    // return the int value or a error message
 }
 exports.positiveInt = positiveInt;
 // create a thumb directory if it does not exist

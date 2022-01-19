@@ -9,11 +9,7 @@ import {
   isInCache,
 } from './functions';
 
-import {
-  outputImageDirectory,
-  inputImageDirectory,
-  defaultResizedValue,
-} from './variables';
+import { outputImageDirectory, inputImageDirectory } from './variables';
 
 // Resize an image to the given parameters
 export const resizer = async (
@@ -34,24 +30,15 @@ export const resizer = async (
       next();
     } else {
       // else, process the image
-      const hasValidFilename = await requesteHasValidFilename(
-        reqParams.filename as unknown as string,
-        inputImageDirectory
-      );
       // test if the file exists in the public folder
-      if (hasValidFilename) {
-        // resize and pass the resized thumb path to the router
-        const outputPath = await resize(
-          reqParams,
-          inputImageDirectory,
-          outputImageDirectory
-        );
-        res.locals.thumbPath = outputPath;
-        next();
-      } else {
-        // no valid filename in the query throws an error
-        throw new Error('Filename does not exist');
-      }
+      // resize and pass the resized thumb path to the router
+      const outputPath = await resize(
+        reqParams,
+        inputImageDirectory,
+        outputImageDirectory
+      );
+      res.locals.thumbPath = outputPath;
+      next();
     }
   } catch (error) {
     next(error);
@@ -84,31 +71,78 @@ export const verifyCache = async (
 };
 
 // check if the request has valid parameters
-export const requesteHasValidInput = (
+export const requesteHasValidInput = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
-  // if the query contains a filename, instances reqParams
+): Promise<void> => {
+  // enum all cases
   try {
-    if (req.query.filename) {
+    const hasValidFilename = await requesteHasValidFilename(
+      req.query.filename as unknown as string,
+      inputImageDirectory
+    );
+    if (
+      !req.query.filename &&
+      !hasValidFilename &&
+      !req.query.width &&
+      !req.query.height
+    ) {
+      throw new Error('Filename, width and height are missing');
+    } else if (
+      req.query.filename &&
+      hasValidFilename &&
+      !req.query.width &&
+      !req.query.height
+    ) {
+      throw new Error('Width and heiht are missing');
+    } else if (
+      req.query.filename &&
+      !hasValidFilename &&
+      !req.query.width &&
+      !req.query.height
+    ) {
+      throw new Error(
+        'Width and heiht are missing and Filename does not exist'
+      );
+    } else if (
+      req.query.filename &&
+      hasValidFilename &&
+      !req.query.width &&
+      req.query.height
+    ) {
+      throw new Error('Width is missing');
+    } else if (
+      req.query.filename &&
+      hasValidFilename &&
+      req.query.width &&
+      !req.query.height
+    ) {
+      throw new Error('Heiht is missing');
+    } else if (
+      !req.query.filename &&
+      !hasValidFilename &&
+      req.query.width &&
+      req.query.height
+    ) {
+      throw new Error('Filename is missing');
+    } else if (
+      req.query.filename &&
+      !hasValidFilename &&
+      req.query.width &&
+      req.query.height
+    ) {
+      throw new Error('Filename does not exist');
+    } else {
+      // if all parameters are set and the filename is present in the directory, instancie the query parameters
       const reqParams: queryParams = {
         filename: req.query.filename as unknown as string,
         // test if the width and height are valid parameters or set them by default
-        width: positiveInt(
-          req.query.width as unknown as string,
-          defaultResizedValue
-        ),
-        height: positiveInt(
-          req.query.height as unknown as string,
-          defaultResizedValue
-        ),
+        width: positiveInt(req.query.width as unknown as string, 'width'),
+        height: positiveInt(req.query.height as unknown as string, 'height'),
       };
       res.locals.reqParams = reqParams;
       next();
-    } else {
-      // no filename in the query throw an error
-      throw new Error('Filename is missing');
     }
   } catch (error) {
     next(error);

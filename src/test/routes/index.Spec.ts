@@ -8,31 +8,42 @@ const request = supertest(app);
 const apiRoutes = '/api';
 const imageRoutes = '/api/image';
 
-describe('Test /api/image responses', () => {
-  describe('with none or incomplete parameters', () => {
-    it('no parameters send should return 500 and "Filename missing"', async () => {
+describe('Test /api/image', () => {
+  describe('with none or incomplete parameters - ', () => {
+    it('no parameters send should return 500 and "Filename, width and height are missing"', async () => {
       const response = await request.get(`${imageRoutes}`);
       expect(response.status).toBe(500);
-      expect(response.text).toBe('Error: Filename is missing');
+      expect(response.text).toBe(
+        'Error: Filename, width and height are missing'
+      );
     });
-    it('filename sends that exists should return 200 and an image as a return content-type', async () => {
+    it('filename sends that exists should return 500 and "Width and heiht are missing"', async () => {
       const response = await request.get(`${imageRoutes}?filename=aFileName`);
-      expect(response.status).toBe(200);
-      expect(response.headers['content-type']).toBe('image/jpeg');
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error: Width and heiht are missing');
     });
-    it('filename sends that does not exists should return 500 and "Filename does not exist"', async () => {
+    it('filename sends that does not exists should return 500 and "Width and heiht are missing and Filename does not exist"', async () => {
       const response = await request.get(
         `${imageRoutes}?filename=notafilename`
       );
       expect(response.status).toBe(500);
-      expect(response.text).toBe('Error: Filename does not exist');
+      expect(response.text).toBe(
+        'Error: Width and heiht are missing and Filename does not exist'
+      );
     });
-    it('width or height set as different as positive interger should set them by default to 200', async () => {
+    it('width set as negative should return 500 and "Error: The width is not positive"', async () => {
       const response = await request.get(
         `${imageRoutes}?filename=aFileName&width=-1&height=abcd`
       );
-      expect(response.status).toBe(200);
-      expect(response.headers['content-type']).toBe('image/jpeg');
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error: The width is not positive');
+    });
+    it('heigth set as letter should return 500 and "Error: The heigth is not positive"', async () => {
+      const response = await request.get(
+        `${imageRoutes}?filename=aFileName&width=100&height=abcd`
+      );
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error: The height is not an integer');
     });
   });
   describe('Test /api/image responses with full correct parameters', () => {

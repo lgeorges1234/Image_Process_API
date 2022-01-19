@@ -34,21 +34,21 @@ export const resize = async (
   reqParams: queryParams,
   fullPath: string,
   thumbPath: string
-): Promise<string> => {
+): Promise<string | Error> => {
+  let outputPath = '';
+  // set the original image path
+  const imagePath = `${fullPath}${reqParams.filename}.jpg`;
+  // set the ouput thumb path
+  outputPath = `${thumbPath}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
+  // resize the original image and send the result to the ouput path
   try {
-    let outputPath = '';
-    // set the original image path
-    const imagePath = `${fullPath}${reqParams.filename}.jpg`;
-    // set the ouput thumb path
-    outputPath = `${thumbPath}${reqParams.filename}_${reqParams.width}_${reqParams.height}_thumb.jpg`;
-    // resize the original image and send the result to the ouput path
     await sharp(imagePath)
       .resize(reqParams.width, reqParams.height, { fit: 'cover' })
       .toFile(outputPath);
-    return outputPath;
-  } catch {
-    throw new Error('Wrong parameters for the resize function');
+  } catch (error) {
+    throw new Error(`not a valid parameter${error}`);
   }
+  return outputPath;
 };
 
 // check if the filename belongs to the input folder
@@ -66,16 +66,17 @@ export const requesteHasValidFilename = async (
 };
 
 // test if the value is a positive integer
-export function positiveInt(
-  value: string,
-  defaultResizedValue: number
-): number {
-  const number = parseInt(value, 10);
-  // return the int value or the default value
-  if (Number.isInteger(number) && number > 0) {
-    return number;
+export function positiveInt(value: string, param: string): number {
+  if (parseInt(value, 10)) {
+    const number = parseInt(value, 10);
+    if (number > 0) {
+      return number;
+    }
+    throw new Error(`The ${param} is not positive`);
+  } else {
+    throw new Error(`The ${param} is not an integer`);
   }
-  return defaultResizedValue;
+  // return the int value or a error message
 }
 
 // create a thumb directory if it does not exist

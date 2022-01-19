@@ -41,11 +41,11 @@ var functions_1 = require("./functions");
 var variables_1 = require("./variables");
 // Resize an image to the given parameters
 var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, reqParams, shouldResize, outputPath, hasValidFilename, outputPath, error_1;
+    var _a, reqParams, shouldResize, outputPath, outputPath, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 7, , 8]);
+                _b.trys.push([0, 5, , 6]);
                 _a = res.locals, reqParams = _a.reqParams, shouldResize = _a.shouldResize;
                 // create a thumb directory if it does not exist
                 return [4 /*yield*/, (0, functions_1.makeOuputDir)("".concat(variables_1.outputImageDirectory))];
@@ -56,26 +56,19 @@ var resizer = function (req, res, next) { return __awaiter(void 0, void 0, void 
                 outputPath = "".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg");
                 res.locals.thumbPath = outputPath;
                 next();
-                return [3 /*break*/, 6];
-            case 2: return [4 /*yield*/, (0, functions_1.requesteHasValidFilename)(reqParams.filename, variables_1.inputImageDirectory)];
+                return [3 /*break*/, 4];
+            case 2: return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
             case 3:
-                hasValidFilename = _b.sent();
-                if (!hasValidFilename) return [3 /*break*/, 5];
-                return [4 /*yield*/, (0, functions_1.resize)(reqParams, variables_1.inputImageDirectory, variables_1.outputImageDirectory)];
-            case 4:
                 outputPath = _b.sent();
                 res.locals.thumbPath = outputPath;
                 next();
-                return [3 /*break*/, 6];
-            case 5: 
-            // no valid filename in the query throws an error
-            throw new Error('Filename does not exist');
-            case 6: return [3 /*break*/, 8];
-            case 7:
+                _b.label = 4;
+            case 4: return [3 /*break*/, 6];
+            case 5:
                 error_1 = _b.sent();
                 next(error_1);
-                return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/];
         }
     });
 }); };
@@ -106,28 +99,76 @@ var verifyCache = function (req, res, next) { return __awaiter(void 0, void 0, v
 }); };
 exports.verifyCache = verifyCache;
 // check if the request has valid parameters
-var requesteHasValidInput = function (req, res, next) {
-    // if the query contains a filename, instances reqParams
-    try {
-        if (req.query.filename) {
-            var reqParams = {
-                filename: req.query.filename,
-                // test if the width and height are valid parameters or set them by default
-                width: (0, functions_1.positiveInt)(req.query.width, variables_1.defaultResizedValue),
-                height: (0, functions_1.positiveInt)(req.query.height, variables_1.defaultResizedValue),
-            };
-            res.locals.reqParams = reqParams;
-            next();
+var requesteHasValidInput = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var hasValidFilename, reqParams, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, (0, functions_1.requesteHasValidFilename)(req.query.filename, variables_1.inputImageDirectory)];
+            case 1:
+                hasValidFilename = _a.sent();
+                if (!req.query.filename &&
+                    !hasValidFilename &&
+                    !req.query.width &&
+                    !req.query.height) {
+                    throw new Error('Filename, width and height are missing');
+                }
+                else if (req.query.filename &&
+                    hasValidFilename &&
+                    !req.query.width &&
+                    !req.query.height) {
+                    throw new Error('Width and heiht are missing');
+                }
+                else if (req.query.filename &&
+                    !hasValidFilename &&
+                    !req.query.width &&
+                    !req.query.height) {
+                    throw new Error('Width and heiht are missing and Filename does not exist');
+                }
+                else if (req.query.filename &&
+                    hasValidFilename &&
+                    !req.query.width &&
+                    req.query.height) {
+                    throw new Error('Width is missing');
+                }
+                else if (req.query.filename &&
+                    hasValidFilename &&
+                    req.query.width &&
+                    !req.query.height) {
+                    throw new Error('Heiht is missing');
+                }
+                else if (!req.query.filename &&
+                    !hasValidFilename &&
+                    req.query.width &&
+                    req.query.height) {
+                    throw new Error('Filename is missing');
+                }
+                else if (req.query.filename &&
+                    !hasValidFilename &&
+                    req.query.width &&
+                    req.query.height) {
+                    throw new Error('Filename does not exist');
+                }
+                else {
+                    reqParams = {
+                        filename: req.query.filename,
+                        // test if the width and height are valid parameters or set them by default
+                        width: (0, functions_1.positiveInt)(req.query.width, 'width'),
+                        height: (0, functions_1.positiveInt)(req.query.height, 'height'),
+                    };
+                    res.locals.reqParams = reqParams;
+                    next();
+                }
+                return [3 /*break*/, 3];
+            case 2:
+                error_2 = _a.sent();
+                next(error_2);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
-        else {
-            // no filename in the query throw an error
-            throw new Error('Filename is missing');
-        }
-    }
-    catch (error) {
-        next(error);
-    }
-};
+    });
+}); };
 exports.requesteHasValidInput = requesteHasValidInput;
 // Handle the error message send back to the client
 var errorHandler = function (err, req, res, next) {

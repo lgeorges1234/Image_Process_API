@@ -60,8 +60,8 @@ require("jasmine");
 var fs_1 = __importStar(require("fs"));
 var functions_1 = require("../../utilities/functions");
 var variables_1 = require("../../utilities/variables");
-describe('The filename exists in the public image directory', function () {
-    it('the readDirectory function returns the image file name and extension when given an existing filename', function () { return __awaiter(void 0, void 0, void 0, function () {
+describe('The readDirectory function', function () {
+    it('returns the image file name and extension when given an existing filename', function () { return __awaiter(void 0, void 0, void 0, function () {
         var filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -75,7 +75,7 @@ describe('The filename exists in the public image directory', function () {
             }
         });
     }); });
-    it('the readDirectory function return a null result when given a false filename', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('return a null result when given a false filename', function () { return __awaiter(void 0, void 0, void 0, function () {
         var filename, dirFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -90,8 +90,8 @@ describe('The filename exists in the public image directory', function () {
         });
     }); });
 });
-describe('The resize function provides an ouput path in the thumb/ directory', function () {
-    it('providing width and height', function () { return __awaiter(void 0, void 0, void 0, function () {
+describe('The resize function ', function () {
+    it('return an ouput path in the thumb/ directory when providing width and height', function () { return __awaiter(void 0, void 0, void 0, function () {
         var reqParams, outputPath;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -110,7 +110,7 @@ describe('The resize function provides an ouput path in the thumb/ directory', f
             }
         });
     }); });
-    it('providing no conform width or height', function () { return __awaiter(void 0, void 0, void 0, function () {
+    xit('return an Error message when providing no conform width or height', function () { return __awaiter(void 0, void 0, void 0, function () {
         var reqParams;
         return __generator(this, function (_a) {
             reqParams = {
@@ -118,7 +118,7 @@ describe('The resize function provides an ouput path in the thumb/ directory', f
                 width: -1,
                 height: 400,
             };
-            expect(function resizer() {
+            expect(function positive() {
                 return __awaiter(this, void 0, void 0, function () {
                     return __generator(this, function (_a) {
                         switch (_a.label) {
@@ -129,13 +129,13 @@ describe('The resize function provides an ouput path in the thumb/ directory', f
                         }
                     });
                 });
-            }).toThrowError('Wrong parameters for the resize function');
+            }).toThrow();
             expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
             return [2 /*return*/];
         });
     }); });
 });
-describe('The makeOutputDir function create an output thumb image', function () {
+describe('The makeOutputDir function', function () {
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var files, err_1;
         return __generator(this, function (_a) {
@@ -160,7 +160,7 @@ describe('The makeOutputDir function create an output thumb image', function () 
             }
         });
     }); });
-    it('return true if the thumb/ does not exist ', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('return true if the thumb/ directory does not exist and create it', function () { return __awaiter(void 0, void 0, void 0, function () {
         var isThumbDirNotPresent;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -173,7 +173,7 @@ describe('The makeOutputDir function create an output thumb image', function () 
             }
         });
     }); });
-    it('return false if the thumb/ already exists', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('return false if the thumb/ directory already exists', function () { return __awaiter(void 0, void 0, void 0, function () {
         var isThumbDirNotPresent;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -187,7 +187,7 @@ describe('The makeOutputDir function create an output thumb image', function () 
         });
     }); });
 });
-describe('The isInCache function check if the thumb image has already been processed', function () {
+describe('The isInCache function', function () {
     beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
         var reqParams;
         return __generator(this, function (_a) {
@@ -207,7 +207,7 @@ describe('The isInCache function check if the thumb image has already been proce
             return [2 /*return*/];
         });
     }); });
-    it('return false if the thumb image is not in cache', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('return false if the processed image is yet not in cache', function () { return __awaiter(void 0, void 0, void 0, function () {
         var reqParams, inCache;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -226,7 +226,7 @@ describe('The isInCache function check if the thumb image has already been proce
             }
         });
     }); });
-    it('return true if the thumb image is now in cache and is present in the folder', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('return true if the processed image is now in cache and is present in the folder', function () { return __awaiter(void 0, void 0, void 0, function () {
         var reqParams, inCache;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -257,6 +257,34 @@ describe('The isInCache function check if the thumb image has already been proce
             inCache = (0, functions_1.isInCache)(reqParams, variables_1.outputImageDirectory);
             expect(inCache).toBeFalse();
             expect(fs_1.default.existsSync("".concat(variables_1.outputImageDirectory).concat(reqParams.filename, "_").concat(reqParams.width, "_").concat(reqParams.height, "_thumb.jpg"))).toBeFalse();
+            return [2 /*return*/];
+        });
+    }); });
+});
+describe('The positivInt function', function () {
+    it('return a positive integer when the provided value is valid', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var isPositivInteger;
+        return __generator(this, function (_a) {
+            isPositivInteger = (0, functions_1.positiveInt)('20', 'width');
+            expect(isPositivInteger).toBe(20);
+            return [2 /*return*/];
+        });
+    }); });
+    it('return an error when the height is not an integer', function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            // const isPositivInteger = positiveInt('20', 200);
+            expect(function positive() {
+                (0, functions_1.positiveInt)('a', 'height');
+            }).toThrowError("The height is not an integer");
+            return [2 /*return*/];
+        });
+    }); });
+    it('return an error when the width is not a positive integer', function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            // const isPositivInteger = positiveInt('20', 200);
+            expect(function positive() {
+                (0, functions_1.positiveInt)('-1', 'width');
+            }).toThrowError("The width is not positive");
             return [2 /*return*/];
         });
     }); });
