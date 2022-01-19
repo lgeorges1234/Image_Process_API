@@ -38,7 +38,7 @@ Project is created with:
 The API needs to proceeds three parameters: _filename_, _width_ and _height_. 
 > Only filename is __mandatory__, both width and height are set by default to **200 px**.
 
-If the filename is missing, or does not correspond to an existing file, a 500 status code is returned along with an error message,
+If the any parameter is missing, invalid or the filename does not correspond to an existing file, a 500 status code is returned along with an error message,
 
 
 ### API path 
@@ -51,8 +51,8 @@ If the filename is missing, or does not correspond to an existing file, a 500 st
 |  Parameter  |  Required  |  Description  |
 | ------------- |-------------| -----|
 |   `filename`    | *required* | Filename of the original image. The filename must be present in the public directory of the server before process. The filename does not include the extension |
-|   `width`      | *optional*      |   Width of the processed image in px. If no value is provided, the default value is 200 px |
-| `height` | *optional*      |    Height of the processed image in px. If no value is provided, the default value is 200 px |
+|   `width`      | *optional*      |   Width of the processed image in px.|
+| `height` | *optional*      |    Height of the processed image in px.|
 
 
 ### Example of API calls:
